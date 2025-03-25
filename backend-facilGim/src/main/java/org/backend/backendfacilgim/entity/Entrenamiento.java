@@ -1,0 +1,59 @@
+package org.backend.backendfacilgim.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "entrenamiento")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Entrenamiento {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_entrenamiento")
+    private Integer idEntrenamiento;
+
+    public enum TipoEntrenamiento {
+        FUERZA,
+        RESISTENCIA,
+        VELOCIDAD,
+        POTENCIA,
+        CARDIOVASCULAR
+    }
+    @NotBlank(message = "El nombre del entrenamiento es obligatorio")
+    private String nombre;
+
+    @NotNull(message = "La fecha del entrenamiento es obligatoria")
+    private LocalDate fechaEntrenamiento;
+
+    @NotBlank(message = "La descripción es obligatoria")
+    private String descripcion;
+
+    @Min(value = 1, message = "La duración debe ser mayor a 0")
+    private int duracion;
+
+    @NotNull(message = "El tipo de entrenamiento es obligatorio")
+    private TipoEntrenamiento tipoEntrenamiento;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
+    @JsonIgnoreProperties("entrenamientos")
+    @NotNull(message = "El usuario es obligatorio")
+    private Usuario usuario;
+
+    @OneToMany(mappedBy = "entrenamiento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("entrenamiento")
+    private List<Ejercicio> ejercicios = new ArrayList<>();
+}
