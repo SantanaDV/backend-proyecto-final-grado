@@ -1,2 +1,133 @@
-# backend-proyecto-final-grado
-"Backend del proyecto final de grado FacilGim"
+# 🚀 Backend FacilGim
+
+Este repositorio contiene el backend del proyecto **FacilGim**, desarrollado con **Spring Boot y Java 17**. FacilGim permite gestionar entrenamientos personales, incluyendo ejercicios detallados con repeticiones y pesos utilizados, autenticación mediante JWT y administración por roles.
+
+---
+
+## 📌 Descripción del Proyecto
+
+**FacilGim** es una aplicación destinada a simplificar el seguimiento de entrenamientos, permitiendo a los usuarios crear, editar y eliminar entrenamientos y ejercicios. El sistema es seguro y utiliza JWT (JSON Web Tokens) para autenticar usuarios y proteger el acceso a recursos.
+
+---
+
+## ⚙️ Tecnología Utilizada
+
+- **Java 17**
+- **Spring Boot 3.x**
+- **Spring Security**
+- **JWT (JSON Web Tokens)**
+- **Spring Data JPA**
+- **MySQL**
+- **Maven**
+
+---
+
+## 🗃️ Diseño de la Base de Datos
+
+El backend utiliza MySQL con la siguiente estructura:
+
+- `usuario`
+- `roles`
+- `usuarios_roles` *(tabla intermedia para relación N:M entre usuario y roles)*
+- `entrenamiento`
+- `ejercicio`
+
+---
+
+## 🔐 Autenticación y Seguridad (JWT)
+
+El sistema protege recursos mediante JWT en los siguientes endpoints:
+
+- **POST** `/auth/signup` - Registro
+- **POST** `/auth/login` - Inicio de sesión
+
+Las peticiones protegidas necesitan incluir el siguiente encabezado:
+
+```http
+Authorization: Bearer <JWT Token>
+
+## 📍 Endpoints Principales (REST API)
+
+### 🔹 Autenticación
+
+| Método | Endpoint       | Descripción                         |
+|--------|----------------|-------------------------------------|
+| POST   | `/auth/signup` | Registrar usuario                   |
+| POST   | `/auth/login`  | Autenticar usuario (retorna JWT)    |
+
+### 🔹 Gestión de Entrenamientos (Requiere JWT)
+
+| Método | Endpoint                  | Descripción                             |
+|--------|---------------------------|-----------------------------------------|
+| POST   | `/entrenamientos`         | Crear nuevo entrenamiento               |
+| GET    | `/entrenamientos`         | Obtener entrenamientos del usuario      |
+| GET    | `/entrenamientos/{id}`    | Detalle entrenamiento específico        |
+| PUT    | `/entrenamientos/{id}`    | Actualizar entrenamiento                |
+| DELETE | `/entrenamientos/{id}`    | Eliminar entrenamiento                  |
+
+---
+
+## 🛠️ Instrucciones para Ejecutar en Local
+
+### 🔸 Requisitos
+
+- Java JDK 17
+- MySQL Server (recomendado XAMPP)
+- Postman
+- Git
+- Maven
+
+### 🔸 Ejecución Paso a Paso
+
+**1. Clona el repositorio**
+
+```bash
+git clone <url-del-repositorio>
+
+
+## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
+
+### Crear Base de Datos en MySQL
+
+Ejecuta el siguiente comando SQL para crear la base de datos:
+
+```sql
+CREATE DATABASE facilgim_db;
+## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
+
+### 2. Crear Base de Datos en MySQL
+
+Ejecuta el siguiente comando SQL para crear la base de datos:
+
+```sql
+CREATE DATABASE facilgim_db;
+
+###  Configurar acceso MySQL
+
+Edita el archivo `application.properties` ubicado en la ruta `/src/main/resources/` con la siguiente configuración:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/facilgim_db
+spring.datasource.username=root
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=update
+
+
+###  Ejecutar la aplicación
+
+Desde la terminal situada en el directorio raíz del proyecto, ejecuta:
+
+```bash
+mvn spring-boot:run
+
+### Probar la API con Postman
+ * Registra un nuevo usuario:
+
+```http
+POST /auth/signup
+
+ *Inicia sesión y obtén tu token JWT:
+ ```http
+POST /auth/login
+
+
