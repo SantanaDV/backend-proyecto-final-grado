@@ -1,4 +1,4 @@
-# 🚀 Backend FacilGim
+#  Backend FacilGim
 
 Este repositorio contiene el backend del proyecto **FacilGim**, desarrollado con **Spring Boot y Java 17**. FacilGim permite gestionar entrenamientos personales, incluyendo ejercicios detallados con repeticiones y pesos utilizados, autenticación mediante JWT y administración por roles.
 
@@ -12,13 +12,14 @@ Este repositorio contiene el backend del proyecto **FacilGim**, desarrollado con
 
 ## ⚙️ Tecnología Utilizada
 
-- **Java 17**
-- **Spring Boot 3.x**
-- **Spring Security**
-- **JWT (JSON Web Tokens)**
-- **Spring Data JPA**
-- **MySQL**
-- **Maven**
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" width="20" height="20"> **Java 17**  
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" width="20" height="20"> **Spring Boot 3.x**  
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" width="20" height="20"> **Spring Security**  
+- <img src="https://jwt.io/img/pic_logo.svg" width="20" height="20"> **JWT (JSON Web Tokens)**  
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/hibernate/hibernate-original.svg" width="20" height="20"> **Spring Data JPA**  
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width="20" height="20"> **MySQL**  
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/maven/maven-original.svg" width="20" height="20"> **Maven**
+
 
 ---
 
@@ -88,15 +89,6 @@ git clone <url-del-repositorio>
 ## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
 
 ### Crear Base de Datos en MySQL
-
-Ejecuta el siguiente comando SQL para crear la base de datos:
-
-```sql
-CREATE DATABASE facilgim_db;
-```
-## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
-
-### 2. Crear Base de Datos en MySQL
 
 Ejecuta el siguiente comando SQL para crear la base de datos:
 
