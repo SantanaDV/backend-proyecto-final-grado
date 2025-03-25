@@ -45,7 +45,7 @@ Las peticiones protegidas necesitan incluir el siguiente encabezado:
 
 ```http
 Authorization: Bearer <JWT Token>
-
+```
 ## 📍 Endpoints Principales (REST API)
 
 ### 🔹 Autenticación
@@ -83,7 +83,7 @@ Authorization: Bearer <JWT Token>
 
 ```bash
 git clone <url-del-repositorio>
-
+```
 
 ## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
 
@@ -93,6 +93,7 @@ Ejecuta el siguiente comando SQL para crear la base de datos:
 
 ```sql
 CREATE DATABASE facilgim_db;
+```
 ## 🛠️ Instrucciones de Configuración y Ejecución del Proyecto
 
 ### 2. Crear Base de Datos en MySQL
@@ -101,6 +102,7 @@ Ejecuta el siguiente comando SQL para crear la base de datos:
 
 ```sql
 CREATE DATABASE facilgim_db;
+```
 
 ###  Configurar acceso MySQL
 
@@ -111,6 +113,7 @@ spring.datasource.url=jdbc:mysql://localhost:3306/facilgim_db
 spring.datasource.username=root
 spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=update
+```
 
 
 ###  Ejecutar la aplicación
@@ -119,15 +122,18 @@ Desde la terminal situada en el directorio raíz del proyecto, ejecuta:
 
 ```bash
 mvn spring-boot:run
+```
 
 ### Probar la API con Postman
  * Registra un nuevo usuario:
 
 ```http
 POST /auth/signup
+```
 
  *Inicia sesión y obtén tu token JWT:
  ```http
 POST /auth/login
+```
 
 
