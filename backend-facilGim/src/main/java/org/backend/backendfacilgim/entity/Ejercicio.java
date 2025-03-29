@@ -30,6 +30,8 @@ public class Ejercicio {
     @Min(value = 0, message = "El peso no puede ser negativo")
     private double peso;
 
+    private String imagenUrl;
+
     @ManyToOne
     @JoinColumn(name = "id_entrenamiento", nullable = false)
     @JsonIgnoreProperties("ejercicios")

@@ -2,7 +2,6 @@ package org.backend.backendfacilgim.repository;
 
 import jakarta.validation.constraints.NotBlank;
 import org.backend.backendfacilgim.entity.Ejercicio;
-import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,8 +22,5 @@ public interface EjercicioRepository extends JpaRepository<Ejercicio, Integer> {
     void deleteEjercicioByNombre(@NotBlank(message = "El nombre del ejercicio es obligatorio") String nombre);
 
 
-    Ejercicio findEjercicioByIdEjercicio(Integer idEjercicio);
-
-    Ejercicio findEjercicioByNombre(@NotBlank(message = "El nombre del ejercicio es obligatorio") String nombre);
 
 }

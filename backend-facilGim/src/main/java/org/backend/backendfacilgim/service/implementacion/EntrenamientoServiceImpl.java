@@ -1,6 +1,6 @@
 package org.backend.backendfacilgim.service.implementacion;
 
-import org.backend.backendfacilgim.entity.Ejercicio;
+
 import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.backend.backendfacilgim.repository.EntrenamientoRepository;
 import org.backend.backendfacilgim.service.EntrenamientoService;
@@ -36,8 +36,8 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     }
 
     @Override
-    public Entrenamiento obtenerEntrenamientoPorNombre(String nombre) {
-        return entrenamientoRepository.findEntrenamientoByNombre(nombre);
+    public List<Entrenamiento> obtenerEntrenamientosPorNombre(String nombre) {
+        return entrenamientoRepository.findEntrenamientosByNombre(nombre);
     }
 
     @Override

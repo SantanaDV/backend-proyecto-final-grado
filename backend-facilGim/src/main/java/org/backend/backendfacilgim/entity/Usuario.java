@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class Usuario {
     // Contraseña encriptada (bcrypt) => se guarda cifrada en la BD
     @NotBlank(message = "La contraseña es obligatoria")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ToString.Exclude //Para más seguridad ignora en el to string el password
     private String password;
 
     @Email(message = "Debe ser un correo valido")

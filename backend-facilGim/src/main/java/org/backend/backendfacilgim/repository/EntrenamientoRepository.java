@@ -1,12 +1,10 @@
 package org.backend.backendfacilgim.repository;
 
-import jakarta.validation.constraints.NotNull;
 import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -17,7 +15,7 @@ public interface EntrenamientoRepository extends JpaRepository<Entrenamiento, In
      * @param nombre
      * @return
      */
-    Entrenamiento findEntrenamientoByNombre(String nombre);
+    List<Entrenamiento> findEntrenamientosByNombre(String nombre);
 
     List<Entrenamiento> findByFechaEntrenamientoBetween(LocalDate fechaInicio, LocalDate fechaFin);
 

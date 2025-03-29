@@ -42,7 +42,7 @@ public interface EntrenamientoService {
      * @param nombre
      * @return objeto Entrenamiento
      */
-    Entrenamiento obtenerEntrenamientoPorNombre(String nombre);
+    List<Entrenamiento> obtenerEntrenamientosPorNombre(String nombre);
 
     //POST
 

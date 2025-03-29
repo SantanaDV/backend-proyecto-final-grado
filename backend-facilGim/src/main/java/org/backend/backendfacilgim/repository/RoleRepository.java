@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
     /**
      * Busca un rol por su nombre (ej: "ROLE_USER", "ROLE_ADMIN").
      * @param name nombre del rol buscado.

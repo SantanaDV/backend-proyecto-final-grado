@@ -23,8 +23,10 @@ public class EjercicioServiceImpl implements EjercicioService {
 
     @Override
     public Ejercicio getEjercicioByNombre(String nombreEjercicio) {
-        return ejercicioRepository.getEjercicioByNombre(nombreEjercicio);
+        return Optional.ofNullable(ejercicioRepository.getEjercicioByNombre(nombreEjercicio))
+                .orElseThrow(() -> new RuntimeException("Ejercicio no encontrado por nombre: " + nombreEjercicio));
     }
+
 
     @Override
     public List<Ejercicio> listarEjercicios() {
@@ -38,18 +40,22 @@ public class EjercicioServiceImpl implements EjercicioService {
 
     @Override
     public Ejercicio actualizarEjercicio(Integer ejercicioId, Ejercicio datosNuevos) {
-        return actualizarEjercicio(ejercicioRepository.findEjercicioByIdEjercicio(ejercicioId), datosNuevos);
+
+        return actualizarEjercicio(ejercicioRepository.findById(ejercicioId).orElseThrow(() ->new RuntimeException("Ejercicio no encontrado con ID: " + ejercicioId)), datosNuevos);
+
+
     }
 
     @Override
-    public Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos) {
+    public Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String username) {
+        //Implementar la busqueda por nombre
 
-        return actualizarEjercicio(ejercicioRepository.findEjercicioByNombre(nombreEjercicio), datosNuevos);
+        return actualizarEjercicio(ejercicioRepository.getEjercicioByNombre(nombreEjercicio), datosNuevos);
     }
 
     @Override
-    public void eliminarEjercicio(Integer id) {
-        ejercicioRepository.delete(ejercicioRepository.findEjercicioByIdEjercicio(id));
+    public void eliminarEjercicio(Integer ejercicioId) {
+        ejercicioRepository.delete(ejercicioRepository.findById(ejercicioId).orElseThrow(() ->new RuntimeException("Ejercicio no encontrado con ID: " + ejercicioId)));
     }
 
     @Override
@@ -62,6 +68,7 @@ public class EjercicioServiceImpl implements EjercicioService {
         ejercicioEncontrado.setPeso(ejercicioDatosNuevos.getPeso());
         ejercicioEncontrado.setNombre(ejercicioDatosNuevos.getNombre());
         ejercicioEncontrado.setRepeticiones(ejercicioDatosNuevos.getRepeticiones());
+        ejercicioEncontrado.setImagenUrl(ejercicioDatosNuevos.getImagenUrl());
         return ejercicioEncontrado;
     }
 }
