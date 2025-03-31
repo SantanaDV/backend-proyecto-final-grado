@@ -2,6 +2,7 @@ package org.backend.backendfacilgim.service.implementacion;
 
 
 import org.backend.backendfacilgim.entity.Entrenamiento;
+import org.backend.backendfacilgim.exception.CustomException;
 import org.backend.backendfacilgim.repository.EntrenamientoRepository;
 import org.backend.backendfacilgim.service.EntrenamientoService;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     @Override
     public Entrenamiento actualizarEntrenamiento(Integer id, Entrenamiento datosNuevos) {
         Entrenamiento entrenamientoExistente = entrenamientoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrenamiento no encontrado con ID: " + id));
+                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + id));
 
         return actualizarEntrenamiento(entrenamientoExistente, datosNuevos);
     }
@@ -59,12 +60,12 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     }
 
     @Override
-    public void EliminarEjercicio(Integer id) {
+    public void eliminarEntrenamiento(Integer id) {
 
     }
 
     @Override
-    public void EliminarEjercicioPorNombre(String nombre) {
+    public void eliminarEntrenamientoPorNombre(String nombre) {
 
     }
 

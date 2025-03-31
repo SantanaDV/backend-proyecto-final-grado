@@ -24,7 +24,7 @@ public interface EjercicioService {
      * @param nombreEjercicio nombre del ejercico
      * @return Un objeto Ejercicio
      */
-    Ejercicio getEjercicioByNombre(String nombreEjercicio);
+    Optional<Ejercicio> getEjercicioByNombre(String nombreEjercicio);
 
     /**
      * Lista todos los ejercicios
@@ -50,7 +50,7 @@ public interface EjercicioService {
      *
      * @param ejercicioId id del ejercicio
      * @param datosNuevos objeto (JSON) con los datos nuevos actualizados
-     * @return objeto ejercicop
+     * @return objeto Ejercicio
      */
     Ejercicio actualizarEjercicio(Integer ejercicioId, Ejercicio datosNuevos);
 
@@ -61,7 +61,8 @@ public interface EjercicioService {
      * @param datosNuevos
      * @return
      */
-    Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String Username);
+    Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String username);
+
 
 
     //DELETE

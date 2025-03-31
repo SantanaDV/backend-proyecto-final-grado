@@ -11,35 +11,35 @@ public interface UsuarioService {
     /**
      * Retorna un usuario por el Id;
      *
-     * @param ejercicioId
-     * @return Un objeto Ejercicio
+     * @param usuarioId
+     * @return Un objeto Usuario
      */
-    Usuario getEjercicio(Integer ejercicioId);
+    Usuario getUsuario(Integer usuarioId);
 
 
     /**
-     * Retorna un usuario buscandolo por el nombre
+     * Retorna un usuario buscándolo por el nombre
      *
-     * @param nombreEjercicio
-     * @return Un objeto Ejercicio
+     * @param nombreUsuario
+     * @return Un objeto Usuario
      */
-    Usuario getEjercicioByNombre(String nombreEjercicio);
+    Usuario getUsuarioByUsername(String nombreUsuario);
 
     /**
-     * Lista todos los usuario
+     * Lista todos los usuarios
      *
-     * @return List<Ejercicio>
+     * @return List<Usuario>
      */
-    List<Usuario> listarEjercicios();
+    List<Usuario> listarUsuarios();
     //POST
 
     /**
      * Retorna un objeto usuario que ha sido introduce mediante un Json
      *
      * @param usuario
-     * @return objeto Ejercicio
+     * @return objeto Usuario
      */
-    Usuario crearEjercicio(Usuario usuario);
+    Usuario crearUsuario(Usuario usuario);
 
 
     //PUT
@@ -47,20 +47,20 @@ public interface UsuarioService {
     /**
      * Actualiza los datos de un usuario basándonos en su id
      *
-     * @param ejercicioId
+     * @param usuarioId
      * @param datosNuevos
      * @return
      */
-    Usuario actualizarEjercicio(Integer ejercicioId, Usuario datosNuevos);
+    Usuario actualizarUsuario(Integer usuarioId, Usuario datosNuevos);
 
     /**
-     * Actualiza los datos de un usuario basándonos en su nombre
+     * Actualiza los datos de un usuario basándonos en su username
      *
-     * @param nombreEjercicio
+     * @param username
      * @param datosNuevos
      * @return
      */
-    Usuario actualizarEjercicioPorNombre(String nombreEjercicio, Usuario datosNuevos);
+    Usuario actualizarUsuarioPorUsuario(String username, Usuario datosNuevos);
 
 
     //DELETE
@@ -70,13 +70,13 @@ public interface UsuarioService {
      *
      * @param id
      */
-    void eliminarEjercicio(Integer id);
+    void eliminarUsuario(Integer id);
 
     /**
      * Eliminar un usuario por su nombre
-     * @param nombre
+     * @param username
      */
-    void eliminarEjercicioPorNombre(String nombre);
+    void eliminarUsuarioPorUsername(String username);
 
 
 

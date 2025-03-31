@@ -77,16 +77,16 @@ public interface EntrenamientoService {
     //DELETE
 
     /**
-     * Elimina un ejercicio por su id
+     * Elimina un entrenamiento por su id
      * @param id
      */
-    void EliminarEjercicio(Integer id);
+    void eliminarEntrenamiento(Integer id);
 
     /**
-     * Elimina un ejercicio por su id
+     * Elimina un entrenamiento por su nombre
      * @param nombre
      */
-    void EliminarEjercicioPorNombre(String nombre);
+    void eliminarEntrenamientoPorNombre(String nombre);
 
 
 }
