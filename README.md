@@ -53,8 +53,8 @@ Authorization: Bearer <JWT Token>
 
 | Método | Endpoint       | Descripción                         |
 |--------|----------------|-------------------------------------|
-| POST   | `/auth/signup` | Registrar usuario                   |
-| POST   | `/auth/login`  | Autenticar usuario (retorna JWT)    |
+| POST   | `/registrar` | Registrar usuario                   |
+| POST   | `/login`  | Autenticar usuario (retorna JWT)    |
 
 ### 🔹 Gestión de Entrenamientos (Requiere JWT)
 
@@ -125,7 +125,7 @@ POST /login
 
  *Inicia sesión y obtén tu token JWT:
  ```http
-POST /registro
+POST /registrar
 ```
 
 
