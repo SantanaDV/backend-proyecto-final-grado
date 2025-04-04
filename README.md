@@ -39,8 +39,8 @@ El backend utiliza MySQL con la siguiente estructura:
 
 El sistema protege recursos mediante JWT en los siguientes endpoints:
 
-- **POST** `/auth/signup` - Registro
-- **POST** `/auth/login` - Inicio de sesión
+- **POST** `/registrar` - Registro
+- **POST** `/login` - Inicio de sesión
 
 Las peticiones protegidas necesitan incluir el siguiente encabezado:
 
@@ -53,8 +53,8 @@ Authorization: Bearer <JWT Token>
 
 | Método | Endpoint       | Descripción                         |
 |--------|----------------|-------------------------------------|
-| POST   | `/auth/signup` | Registrar usuario                   |
-| POST   | `/auth/login`  | Autenticar usuario (retorna JWT)    |
+| POST   | `/registrar` | Registrar usuario                   |
+| POST   | `/login`  | Autenticar usuario (retorna JWT)    |
 
 ### 🔹 Gestión de Entrenamientos (Requiere JWT)
 
@@ -120,12 +120,12 @@ mvn spring-boot:run
  * Registra un nuevo usuario:
 
 ```http
-POST /auth/signup
+POST /login
 ```
 
  *Inicia sesión y obtén tu token JWT:
  ```http
-POST /auth/login
+POST /registrar
 ```
 
 
