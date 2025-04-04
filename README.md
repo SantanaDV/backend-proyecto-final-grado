@@ -39,8 +39,8 @@ El backend utiliza MySQL con la siguiente estructura:
 
 El sistema protege recursos mediante JWT en los siguientes endpoints:
 
-- **POST** `/auth/signup` - Registro
-- **POST** `/auth/login` - Inicio de sesión
+- **POST** `/registrar` - Registro
+- **POST** `/login` - Inicio de sesión
 
 Las peticiones protegidas necesitan incluir el siguiente encabezado:
 
