@@ -1,12 +1,16 @@
 package org.backend.backendfacilgim.controller;
 
+import jakarta.validation.Valid;
 import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.backend.backendfacilgim.Utilities.Utils.validation;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -57,6 +61,36 @@ public class UsuarioController {
      */
     @PostMapping
     public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
+        Usuario creado = usuarioService.crearUsuario(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    }
+
+    /**
+     * Registra o crea un nuevo usuario de forma pública.
+     * Fuerza admin=false para que nadie se dé de alta como administrador.
+     *
+     * @param usuario Objeto Usuario con los datos (JSON).
+     * @param result BindingResult para validaciones.
+     * @return Respuesta con el usuario creado o errores de validación.
+     */
+    @PostMapping("/registrar")
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody Usuario usuario,
+                                              BindingResult result) {
+        if (result.hasErrors()) {
+            return validation(result);
+        }
+
+        // Forzamos para que no pueda autoproclamarse admin
+        usuario.setAdmin(false);
+
+
+        // Comprobamos username duplicado
+        if (usuarioService.existePorUsername(usuario.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("El username ya está en uso.");
+        }
+        if(usuario.getPassword().)
+
         Usuario creado = usuarioService.crearUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }

@@ -55,6 +55,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.delete(usuarioRepository.findByUsername(username).orElseThrow(()-> new CustomException("El usuario debe existir para poder ser eliminado")));
     }
 
+    @Override
+    public boolean existePorUsername(String username) {
+        return usuarioRepository.existsByUsername(username);
+    }
+
     private Usuario actualizarUsuarioAux(Usuario usuarioEncontrado, Usuario usuarioDatosNuevos) {
         usuarioEncontrado.setUsername(usuarioDatosNuevos.getUsername());
         usuarioEncontrado.setPassword(usuarioDatosNuevos.getPassword());

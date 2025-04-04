@@ -78,6 +78,13 @@ public interface UsuarioService {
      */
     void eliminarUsuarioPorUsername(String username);
 
+    /**
+     * Verifica si existe un usuario con el username especificado.
+     * @param username El nombre de usuario que se desea comprobar.
+     * @return true si ya existe, false si no.
+     */
+    boolean existePorUsername(String username);
+
 
 
 
