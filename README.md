@@ -120,12 +120,12 @@ mvn spring-boot:run
  * Registra un nuevo usuario:
 
 ```http
-POST /auth/signup
+POST /login
 ```
 
  *Inicia sesión y obtén tu token JWT:
  ```http
-POST /auth/login
+POST /registro
 ```
 
 
