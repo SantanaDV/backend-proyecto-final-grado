@@ -25,13 +25,9 @@ public class Entrenamiento {
     @Column(name = "id_entrenamiento")
     private Integer idEntrenamiento;
 
-    public enum TipoEntrenamiento {
-        FUERZA,
-        RESISTENCIA,
-        VELOCIDAD,
-        POTENCIA,
-        CARDIOVASCULAR
-    }
+
+
+
     @NotBlank(message = "El nombre del entrenamiento es obligatorio")
     private String nombre;
 
@@ -44,6 +40,8 @@ public class Entrenamiento {
     @Min(value = 1, message = "La duración debe ser mayor a 0")
     private int duracion;
 
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_entrenamiento", nullable = false)
     @NotNull(message = "El tipo de entrenamiento es obligatorio")
     private TipoEntrenamiento tipoEntrenamiento;
 

@@ -5,6 +5,7 @@ import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class UsuarioController {
      * Lista todos los usuarios.
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.listarUsuarios());
     }
@@ -36,6 +38,7 @@ public class UsuarioController {
      * Retorna un usuario por su ID.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Usuario> getUsuario(@PathVariable Integer id) {
         Usuario usuario = usuarioService.getUsuario(id);
         return (usuario != null)
@@ -48,6 +51,7 @@ public class UsuarioController {
      * Retorna un usuario buscándolo por su username.
      */
     @GetMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> getUsuarioByUsername(@PathVariable String username) {
         Usuario usuario = usuarioService.getUsuarioByUsername(username);
         return (usuario != null)
@@ -60,6 +64,7 @@ public class UsuarioController {
      * Crea un nuevo usuario.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
         Usuario creado = usuarioService.crearUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
@@ -89,7 +94,7 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("El username ya está en uso.");
         }
-        if(usuario.getPassword().)
+
 
         Usuario creado = usuarioService.crearUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
@@ -100,6 +105,7 @@ public class UsuarioController {
      * Actualiza los datos de un usuario basándonos en su id.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Integer id,
                                                      @RequestBody Usuario datosNuevos) {
         Usuario actualizado = usuarioService.actualizarUsuario(id, datosNuevos);
@@ -111,6 +117,7 @@ public class UsuarioController {
      * Actualiza los datos de un usuario basándonos en su username.
      */
     @PutMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> actualizarUsuarioPorUsername(
             @PathVariable String username,
             @RequestBody Usuario datosNuevos
@@ -124,6 +131,7 @@ public class UsuarioController {
      * Elimina un usuario por su id.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Integer id) {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.noContent().build();
@@ -134,6 +142,7 @@ public class UsuarioController {
      * Elimina un usuario por su username.
      */
     @DeleteMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminarUsuarioPorUsername(@PathVariable String username) {
         usuarioService.eliminarUsuarioPorUsername(username);
         return ResponseEntity.noContent().build();

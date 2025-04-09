@@ -20,7 +20,6 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         this.entrenamientoRepository = entrenamientoRepository;
     }
 
-
     @Override
     public List<Entrenamiento> obtenerTodosLosEntrenamiento() {
         return entrenamientoRepository.findAll();
@@ -55,18 +54,29 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     }
 
     @Override
-    public Entrenamiento actualizarEntrenamientoPorNombre(String nombre, Entrenamiento entrenamiento) {
-        return null;
+    public Entrenamiento actualizarEntrenamientoPorNombre(String nombre, Entrenamiento datosNuevos) {
+        List<Entrenamiento> entrenamientos = entrenamientoRepository.findEntrenamientosByNombre(nombre);
+        if (entrenamientos.isEmpty()) {
+            throw new CustomException("No se encontró ningún entrenamiento con nombre: " + nombre);
+        }
+        Entrenamiento entrenamientoExistente = entrenamientos.get(0);
+        return actualizarEntrenamiento(entrenamientoExistente, datosNuevos);
     }
 
     @Override
     public void eliminarEntrenamiento(Integer id) {
-
+        Entrenamiento entrenamiento = entrenamientoRepository.findById(id)
+                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + id));
+        entrenamientoRepository.delete(entrenamiento);
     }
 
     @Override
     public void eliminarEntrenamientoPorNombre(String nombre) {
-
+        List<Entrenamiento> entrenamientos = entrenamientoRepository.findEntrenamientosByNombre(nombre);
+        if (entrenamientos.isEmpty()) {
+            throw new CustomException("No se encontró ningún entrenamiento con nombre: " + nombre);
+        }
+        entrenamientoRepository.deleteAll(entrenamientos);
     }
 
     private Entrenamiento actualizarEntrenamiento(Entrenamiento entrenamientoEncontrado, Entrenamiento entrenamientoDatosNuevos) {
@@ -77,6 +87,6 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoEncontrado.setDuracion(entrenamientoDatosNuevos.getDuracion());
         entrenamientoEncontrado.setEjercicios(entrenamientoDatosNuevos.getEjercicios());
         entrenamientoEncontrado.setUsuario(entrenamientoDatosNuevos.getUsuario());
-        return entrenamientoEncontrado;
+        return entrenamientoRepository.save(entrenamientoEncontrado);
     }
 }

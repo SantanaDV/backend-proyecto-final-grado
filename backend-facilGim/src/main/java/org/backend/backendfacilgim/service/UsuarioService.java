@@ -1,8 +1,10 @@
 package org.backend.backendfacilgim.service;
 
 import org.backend.backendfacilgim.entity.Usuario;
+import org.backend.backendfacilgim.exception.CustomException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioService {
 
@@ -85,8 +87,21 @@ public interface UsuarioService {
      */
     boolean existePorUsername(String username);
 
+    /**
+     * Verifica si ya existe al menos un usuario con el rol de ADMIN.
+     * @return true si hay al menos un ADMIN registrado, false si no.
+     */
+    boolean existeAdmin();
 
 
+    /**
+     * Busca un usuario en la base de datos a partir de su nombre de usuario (username).
+     *
+     * @param username Nombre de usuario único registrado en el sistema.
+     * @return El objeto Usuario correspondiente al username, si existe.
+     * @throws CustomException Si el usuario no es encontrado en la base de datos.
+     */
+    Usuario obtenerUsuarioPorUsername(String username);
 
 
 }

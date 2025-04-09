@@ -1,5 +1,6 @@
 package org.backend.backendfacilgim.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -66,11 +67,11 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )
     // Se indica que ignore la propiedad 'usuarios' en Role para evitar recursividad
-    @JsonIgnoreProperties({"usuarios"})
+    @JsonIgnore
     private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("usuario")
+    @JsonIgnore
     private List<Entrenamiento> entrenamientos = new ArrayList<>();
 
 

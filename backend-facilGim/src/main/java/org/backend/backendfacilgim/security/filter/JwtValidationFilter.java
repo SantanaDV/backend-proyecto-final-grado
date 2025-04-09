@@ -54,7 +54,6 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             // Extraer la lista de roles correctamente desde los claims
             List<String> roles = claims.get("authorities", List.class);
 
-            //BORRAR TODO
             if (username == null || roles == null) {
 
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());

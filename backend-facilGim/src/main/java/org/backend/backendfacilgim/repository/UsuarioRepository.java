@@ -1,6 +1,5 @@
 package org.backend.backendfacilgim.repository;
 
-import jakarta.validation.constraints.NotBlank;
 import org.backend.backendfacilgim.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -24,12 +23,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
      */
     Optional<Usuario> findByUsername(String username);
 
-    boolean existsByUsername(@NotBlank(message = "El usuario no puede estar vacío") String username);
+    boolean existsByUsername( String username);
 
     /**
      * Verifica si hay al menos un usuario con el rol ADMIN.
      */
     boolean existsByRoles_Name(String roleName);
-    
+
+//
     
 }

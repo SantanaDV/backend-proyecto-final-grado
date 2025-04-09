@@ -25,13 +25,11 @@ public class EjercicioServiceImpl implements EjercicioService {
     @Override
     public Optional<Ejercicio> getEjercicioByNombre(String nombreEjercicio) {
         Ejercicio ejercicio = ejercicioRepository.getEjercicioByNombre(nombreEjercicio);
-        if(ejercicio == null) {
+        if (ejercicio == null) {
             throw new CustomException("Ejercicio no encontrado por nombre: " + nombreEjercicio);
         }
         return Optional.of(ejercicio);
     }
-
-
 
     @Override
     public List<Ejercicio> listarEjercicios() {
@@ -45,31 +43,34 @@ public class EjercicioServiceImpl implements EjercicioService {
 
     @Override
     public Ejercicio actualizarEjercicio(Integer ejercicioId, Ejercicio datosNuevos) {
-
-        return ejercicioRepository.save(actualizarEjercicio(ejercicioRepository.findById(ejercicioId).orElseThrow(() ->new CustomException("Ejercicio no encontrado con ID: " + ejercicioId)), datosNuevos));
-
-
+        return ejercicioRepository.save(actualizarEjercicio(
+                ejercicioRepository.findById(ejercicioId)
+                        .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + ejercicioId)),
+                datosNuevos));
     }
 
     @Override
     public Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String username) {
-        //Implementar la busqueda por nombre
         Ejercicio ejercicioExistente = ejercicioRepository
-                .findNombreAndEntrenamiento_Usuario_Username(nombreEjercicio, username);
-        if(ejercicioExistente == null) {
+                .findByNombreAndEntrenamiento_Usuario_Username(nombreEjercicio, username);
+        if (ejercicioExistente == null) {
             throw new CustomException("No se encontró el ejercicio " + nombreEjercicio + " para el usuario " + username);
         }
-        // Actualizar los campos con los datos nuevos
         return ejercicioRepository.save(actualizarEjercicio(ejercicioExistente, datosNuevos));
     }
 
     @Override
     public void eliminarEjercicio(Integer ejercicioId) {
-        ejercicioRepository.delete(ejercicioRepository.findById(ejercicioId).orElseThrow(() ->new CustomException("Ejercicio no encontrado con ID: " + ejercicioId)));
+        ejercicioRepository.delete(ejercicioRepository.findById(ejercicioId)
+                .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + ejercicioId)));
     }
 
     @Override
     public void eliminarEjercicioPorNombre(String nombre) {
+        Ejercicio ejercicio = ejercicioRepository.getEjercicioByNombre(nombre);
+        if (ejercicio == null) {
+            throw new CustomException("No se encontró el ejercicio con nombre: " + nombre);
+        }
         ejercicioRepository.deleteEjercicioByNombre(nombre);
     }
 

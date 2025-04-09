@@ -12,16 +12,17 @@ public interface EjercicioRepository extends JpaRepository<Ejercicio, Integer> {
      * @param nombre
      * @return
      */
-    Ejercicio getEjercicioByNombre(@NotBlank(message = "El nombre del ejercicio es obligatorio") String nombre);
+    Ejercicio getEjercicioByNombre(String nombre);
 
 
-    Ejercicio findNombreAndEntrenamiento_Usuario_Username(String nombre, String username);
+    Ejercicio findByNombreAndEntrenamiento_Usuario_Username(String nombre, String username);
+
 
     /**
      * Elimina un ejercicio por nombre no permitiendo que el nombre este vacio
      * @param nombre
      */
-    void deleteEjercicioByNombre(@NotBlank(message = "El nombre del ejercicio es obligatorio") String nombre);
+    void deleteEjercicioByNombre(String nombre);
 
 
 

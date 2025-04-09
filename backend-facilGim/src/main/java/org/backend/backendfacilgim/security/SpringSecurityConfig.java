@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +26,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import java.io.PrintWriter;
 
 @Configuration
+@EnableMethodSecurity   // Esto habilita el procesamiento de @PreAuthorize
 public class SpringSecurityConfig {
 
     @Autowired
@@ -55,6 +57,11 @@ public class SpringSecurityConfig {
         JwtValidationFilter validationFilter = new JwtValidationFilter(authenticationManager());
 
         return http
+                // Manejo de 403 Forbidden
+                // Configuración de sesiones
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                //Desabilitar el CSRF ya que solo vamos a trabajar con la API
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         //Rutas a la documentacion pública
                         /*
@@ -67,30 +74,23 @@ public class SpringSecurityConfig {
                                 "/v3/api-docs/public-api",
                                 "/swagger-resources/**",
                                 "/webjars/**"
-                        ).permitAll()*/
+                        ).permitAll()
+*/
 
-
-                        .requestMatchers(HttpMethod.POST, "/login", "/registro").permitAll()
-
-
-
+                        .requestMatchers(HttpMethod.POST, "/login", "/api/usuarios/registrar").permitAll()
+                                .anyRequest().permitAll()
 
 
                         // Cualquier otra ruta requiere autenticación
-                        .anyRequest().authenticated()
+                        //  Quitado mientras pruebo rutas
+                       // .anyRequest().authenticated()
                 )
 
 // Manejo de excepciones de autenticación y autorización
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint()) // Manejo de 401 Unauthorized
                         .accessDeniedHandler(customAccessDeniedHandler())
-                )// Manejo de 403 Forbidden
-                // Configuración de sesiones
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                //  Deshabilitar CSRF solo para las APIs, pero mantenerlo en login HTML
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
-
+                )
                 .addFilter(validationFilter)
                 .addFilterBefore(authFilter, JwtValidationFilter.class)
 
