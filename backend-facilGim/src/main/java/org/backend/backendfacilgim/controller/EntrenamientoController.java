@@ -1,5 +1,7 @@
 package org.backend.backendfacilgim.controller;
 
+import jakarta.validation.Valid;
+import org.backend.backendfacilgim.dto.EntrenamientoDTO;
 import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.backend.backendfacilgim.service.EntrenamientoService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -103,6 +105,19 @@ public class EntrenamientoController {
         Entrenamiento actualizado = entrenamientoService.actualizarEntrenamientoPorNombre(nombre, entrenamiento);
         return ResponseEntity.ok(actualizado);
     }
+
+    /**
+     * PUT /api/entrenamientos/dto/{id}
+     * Actualiza un entrenamiento a partir de un DTO con IDs simples.
+     */
+    @PutMapping("/dto/{id}")
+    public ResponseEntity<Entrenamiento> actualizarEntrenamientoDesdeDTO(
+            @PathVariable Integer id,
+            @Valid @RequestBody EntrenamientoDTO dto) {
+        Entrenamiento actualizado = entrenamientoService.actualizarEntrenamientoDesdeDTO(id, dto);
+        return ResponseEntity.ok(actualizado);
+    }
+
 
     /**
      * DELETE /api/entrenamientos/{id}

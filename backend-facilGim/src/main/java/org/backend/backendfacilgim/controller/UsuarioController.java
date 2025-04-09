@@ -65,9 +65,15 @@ public class UsuarioController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
-        Usuario creado = usuarioService.crearUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    public ResponseEntity<String> crearUsuario(@RequestBody Usuario usuario) {
+        // Comprobamos username duplicado
+        if (usuarioService.existePorUsername(usuario.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario en uso");
+        }else{
+            Usuario creado = usuarioService.crearUsuario(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body("usuario creado");
+        }
+
     }
 
     /**

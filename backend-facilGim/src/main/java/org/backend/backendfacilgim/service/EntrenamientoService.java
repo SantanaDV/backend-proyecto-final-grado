@@ -1,6 +1,7 @@
 package org.backend.backendfacilgim.service;
 
 
+import org.backend.backendfacilgim.dto.EntrenamientoDTO;
 import org.backend.backendfacilgim.entity.Entrenamiento;
 
 import java.time.LocalDate;
@@ -54,6 +55,14 @@ public interface EntrenamientoService {
      */
     Entrenamiento crearEntrenamiento(Entrenamiento entrenamiento);
 
+    /**
+     * Crea un entrenamiento a partir de un DTO.
+     * @param entrenamientoDTO DTO recibido desde frontend
+     * @return Entrenamiento creado
+     */
+    Entrenamiento crearEntrenamientoDesdeDTO(EntrenamientoDTO entrenamientoDTO);
+
+
     //PUT
 
     /**
@@ -73,6 +82,14 @@ public interface EntrenamientoService {
      * @return objeto Entrenamiento
      */
     Entrenamiento actualizarEntrenamientoPorNombre(String nombre, Entrenamiento entrenamiento);
+
+    /**
+     * Actualiza un entrenamiento desde un DTO por su ID.
+     * @param id ID del entrenamiento
+     * @param dto DTO con los nuevos datos
+     * @return Entrenamiento actualizado
+     */
+    Entrenamiento actualizarEntrenamientoDesdeDTO(Integer id, EntrenamientoDTO dto);
 
     //DELETE
 
