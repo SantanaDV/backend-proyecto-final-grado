@@ -18,7 +18,7 @@ public interface EntrenamientoService {
      *
      * @return List<Ejercicio>
      */
-    List<Entrenamiento> obtenerTodosLosEntrenamiento();
+    List<Entrenamiento> obtenerTodosLosEntrenamientos();
 
     /**
      * Retorna una lista de entrenamientos entre dos fechas
@@ -105,5 +105,12 @@ public interface EntrenamientoService {
      */
     void eliminarEntrenamientoPorNombre(String nombre);
 
+    /***
+     * Quitar un ejercicio a un entrenamiento existente por su id y nombre de usuario
+     * @param idEntrenamiento
+     * @param idEjercicio
+     * @param username
+     */
+    void quitarEjercicioDeEntrenamiento(Integer idEntrenamiento, Integer idEjercicio, String username) ;
 
 }

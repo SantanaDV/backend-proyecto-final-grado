@@ -41,6 +41,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Usuario user;
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
+            if (user.getUsername() == null || user.getPassword() == null) {
+                throw new AuthenticationServiceException("Faltan credenciales");
+            }
         } catch (IOException e) {
             throw new AuthenticationServiceException("Error leyendo credenciales", e);
         }

@@ -1,23 +1,15 @@
+// src/main/java/org/backend/backendfacilgim/service/implementacion/EntrenamientoServiceImpl.java
 package org.backend.backendfacilgim.service.implementacion;
 
-
 import org.backend.backendfacilgim.dto.EntrenamientoDTO;
-import org.backend.backendfacilgim.entity.Ejercicio;
-import org.backend.backendfacilgim.entity.Entrenamiento;
-import org.backend.backendfacilgim.entity.TipoEntrenamiento;
-import org.backend.backendfacilgim.entity.Usuario;
+import org.backend.backendfacilgim.entity.*;
 import org.backend.backendfacilgim.exception.CustomException;
-import org.backend.backendfacilgim.repository.EjercicioRepository;
-import org.backend.backendfacilgim.repository.EntrenamientoRepository;
-import org.backend.backendfacilgim.repository.TipoEntrenamientoRepository;
-import org.backend.backendfacilgim.repository.UsuarioRepository;
+import org.backend.backendfacilgim.repository.*;
 import org.backend.backendfacilgim.service.EntrenamientoService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,22 +19,24 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     private final UsuarioRepository usuarioRepository;
     private final TipoEntrenamientoRepository tipoEntrenamientoRepository;
     private final EjercicioRepository ejercicioRepository;
+    private final EntrenamientoEjercicioRepository entrenamientoEjercicioRepository;
 
     public EntrenamientoServiceImpl(
             EntrenamientoRepository entrenamientoRepository,
             UsuarioRepository usuarioRepository,
             TipoEntrenamientoRepository tipoEntrenamientoRepository,
-            EjercicioRepository ejercicioRepository
+            EjercicioRepository ejercicioRepository,
+            EntrenamientoEjercicioRepository entrenamientoEjercicioRepository
     ) {
         this.entrenamientoRepository = entrenamientoRepository;
         this.usuarioRepository = usuarioRepository;
         this.tipoEntrenamientoRepository = tipoEntrenamientoRepository;
         this.ejercicioRepository = ejercicioRepository;
+        this.entrenamientoEjercicioRepository = entrenamientoEjercicioRepository;
     }
 
-
     @Override
-    public List<Entrenamiento> obtenerTodosLosEntrenamiento() {
+    public List<Entrenamiento> obtenerTodosLosEntrenamientos() {
         return entrenamientoRepository.findAll();
     }
 
@@ -68,8 +62,8 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
 
     @Override
     public Entrenamiento crearEntrenamientoDesdeDTO(EntrenamientoDTO dto) {
-      Entrenamiento entrenamiento = new Entrenamiento();
-      rellenarEntrenamientoDesdeDTO(entrenamiento,dto);
+        Entrenamiento entrenamiento = new Entrenamiento();
+        rellenarEntrenamientoDesdeDTO(entrenamiento, dto);
         return entrenamientoRepository.save(entrenamiento);
     }
 
@@ -77,7 +71,6 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     public Entrenamiento actualizarEntrenamiento(Integer id, Entrenamiento datosNuevos) {
         Entrenamiento entrenamientoExistente = entrenamientoRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + id));
-
         return actualizarEntrenamiento(entrenamientoExistente, datosNuevos);
     }
 
@@ -87,16 +80,14 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         if (entrenamientos.isEmpty()) {
             throw new CustomException("No se encontró ningún entrenamiento con nombre: " + nombre);
         }
-        Entrenamiento entrenamientoExistente = entrenamientos.get(0);
-        return actualizarEntrenamiento(entrenamientoExistente, datosNuevos);
+        return actualizarEntrenamiento(entrenamientos.get(0), datosNuevos);
     }
 
     @Override
     public Entrenamiento actualizarEntrenamientoDesdeDTO(Integer id, EntrenamientoDTO dto) {
         Entrenamiento existente = entrenamientoRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + id));
-
-        rellenarEntrenamientoDesdeDTO(existente,dto);
+        rellenarEntrenamientoDesdeDTO(existente, dto);
         return entrenamientoRepository.save(existente);
     }
 
@@ -116,62 +107,54 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoRepository.deleteAll(entrenamientos);
     }
 
+    @Override
+    public void quitarEjercicioDeEntrenamiento(Integer idEntrenamiento, Integer idEjercicio, String username) {
+        Entrenamiento entrenamiento = entrenamientoRepository.findById(idEntrenamiento)
+                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + idEntrenamiento));
+
+        if (!entrenamiento.getUsuario().getUsername().equals(username)) {
+            throw new CustomException("El entrenamiento no pertenece al usuario: " + username);
+        }
+
+        EntrenamientoEjercicio rel = entrenamientoEjercicioRepository
+                .findByEntrenamiento_IdEntrenamientoAndEjercicio_IdEjercicio(idEntrenamiento, idEjercicio)
+                .orElseThrow(() -> new CustomException("Relación entrenamiento-ejercicio no encontrada"));
+
+        entrenamientoEjercicioRepository.delete(rel);
+    }
+
     private Entrenamiento actualizarEntrenamiento(Entrenamiento entrenamientoEncontrado, Entrenamiento entrenamientoDatosNuevos) {
         entrenamientoEncontrado.setFechaEntrenamiento(entrenamientoDatosNuevos.getFechaEntrenamiento());
         entrenamientoEncontrado.setTipoEntrenamiento(entrenamientoDatosNuevos.getTipoEntrenamiento());
         entrenamientoEncontrado.setDescripcion(entrenamientoDatosNuevos.getDescripcion());
         entrenamientoEncontrado.setNombre(entrenamientoDatosNuevos.getNombre());
         entrenamientoEncontrado.setDuracion(entrenamientoDatosNuevos.getDuracion());
-        entrenamientoEncontrado.setEjercicios(entrenamientoDatosNuevos.getEjercicios());
         entrenamientoEncontrado.setUsuario(entrenamientoDatosNuevos.getUsuario());
         return entrenamientoRepository.save(entrenamientoEncontrado);
     }
 
-    /**
-     * Método auxiliar para asignar a una instancia de Entrenamiento los valores provenientes de un DTO.
-     * Este método se encarga de:
-     *  - Recuperar el Usuario y el TipoEntrenamiento a partir de sus IDs en el DTO.
-     *  - Recuperar la lista de Ejercicios a partir de sus IDs.
-     *  - Asignar las propiedades básicas (nombre, descripción, fecha y duración).
-     *  - Enlazar los Ejercicios con el Entrenamiento (actualizando la relación bidireccional).
-     *
-     * @param entrenamiento Instancia de Entrenamiento a la que se asignarán los valores.
-     * @param dto           Data Transfer Object que contiene la información a asignar.
-     */
     private void rellenarEntrenamientoDesdeDTO(Entrenamiento entrenamiento, EntrenamientoDTO dto) {
-        // Validamos y obtenemos el Usuario
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
                 .orElseThrow(() -> new CustomException("Usuario no encontrado con ID: " + dto.getUsuarioId()));
 
-        // Validamos y obtenemos el Tipo de Entrenamiento
         TipoEntrenamiento tipo = tipoEntrenamientoRepository.findById(dto.getTipoEntrenamientoId())
                 .orElseThrow(() -> new CustomException("Tipo de entrenamiento no encontrado con ID: " + dto.getTipoEntrenamientoId()));
 
-        // Recuperamos y validamos cada Ejercicio a partir de sus IDs
-        List<Ejercicio> ejercicios = dto.getEjerciciosId().stream()
-                .map(ejercicioId -> ejercicioRepository.findById(ejercicioId)
-                        .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + ejercicioId)))
-                .collect(Collectors.toList());
+        List<EntrenamientoEjercicio> relaciones = dto.getEjerciciosId().stream().map(id -> {
+            Ejercicio ejercicio = ejercicioRepository.findById(id)
+                    .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + id));
+            EntrenamientoEjercicio ee = new EntrenamientoEjercicio();
+            ee.setEntrenamiento(entrenamiento);
+            ee.setEjercicio(ejercicio);
+            return ee;
+        }).collect(Collectors.toList());
 
-        // Asignamos los valores básicos del DTO al entrenamiento
         entrenamiento.setNombre(dto.getNombre());
         entrenamiento.setDescripcion(dto.getDescripcion());
         entrenamiento.setFechaEntrenamiento(dto.getFechaEntrenamiento());
         entrenamiento.setDuracion(dto.getDuracion());
         entrenamiento.setUsuario(usuario);
         entrenamiento.setTipoEntrenamiento(tipo);
-
-        // Limpiamos los ejercicios actuales (en caso de actualización)
-        if (entrenamiento.getEjercicios() == null) {
-            entrenamiento.setEjercicios(new ArrayList<>());
-        } else {
-            entrenamiento.getEjercicios().clear();
-        }
-
-        // Establecemos la relación bidireccional entre cada ejercicio y el entrenamiento
-        for (Ejercicio ejercicio : ejercicios) {
-            ejercicio.setEntrenamiento(entrenamiento);
-            entrenamiento.getEjercicios().add(ejercicio);
-        }
+        entrenamiento.setEntrenamientoEjercicios(new HashSet<>(relaciones));
     }
 }

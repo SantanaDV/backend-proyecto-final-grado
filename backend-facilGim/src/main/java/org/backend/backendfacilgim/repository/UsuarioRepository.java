@@ -1,5 +1,6 @@
 package org.backend.backendfacilgim.repository;
 
+
 import org.backend.backendfacilgim.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
      * @return un Optional que contiene el Usuario si se encuentra, o vacío si no existe
      */
     Optional<Usuario> findByUsername(String username);
+
+    Optional<Usuario> findByCorreo(String correo);
 
     boolean existsByUsername( String username);
 

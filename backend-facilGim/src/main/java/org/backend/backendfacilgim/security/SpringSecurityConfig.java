@@ -64,8 +64,8 @@ public class SpringSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         //Rutas a la documentacion pública
-                        /*
-                        Añadir en caso de hacer el swagger
+
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -75,15 +75,14 @@ public class SpringSecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-*/
+
 
                         .requestMatchers(HttpMethod.POST, "/login", "/api/usuarios/registrar").permitAll()
                                 .anyRequest().permitAll()
 
 
                         // Cualquier otra ruta requiere autenticación
-                        //  Quitado mientras pruebo rutas
-                       // .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
 
 // Manejo de excepciones de autenticación y autorización

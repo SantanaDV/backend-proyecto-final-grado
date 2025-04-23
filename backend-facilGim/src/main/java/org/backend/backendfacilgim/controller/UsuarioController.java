@@ -1,7 +1,10 @@
 package org.backend.backendfacilgim.controller;
 
 import jakarta.validation.Valid;
+import org.backend.backendfacilgim.dto.UsuarioDTO;
+import org.backend.backendfacilgim.dto.UsuarioRequestDTO;
 import org.backend.backendfacilgim.entity.Usuario;
+import org.backend.backendfacilgim.mapper.UsuarioMapper;
 import org.backend.backendfacilgim.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.backend.backendfacilgim.Utilities.Utils.validation;
 
@@ -23,134 +27,83 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    /**
-     * GET /api/usuarios
-     * Lista todos los usuarios.
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Usuario>> listarUsuarios() {
-        return ResponseEntity.ok(usuarioService.listarUsuarios());
+    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+        List<UsuarioDTO> usuarios = usuarioService.listarUsuarios()
+                .stream().map(UsuarioMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(usuarios);
     }
 
-    /**
-     * GET /api/usuarios/{id}
-     * Retorna un usuario por su ID.
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Usuario> getUsuario(@PathVariable Integer id) {
+    public ResponseEntity<UsuarioDTO> getUsuario(@PathVariable Integer id) {
         Usuario usuario = usuarioService.getUsuario(id);
-        return (usuario != null)
-                ? ResponseEntity.ok(usuario)
-                : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(UsuarioMapper.toDTO(usuario));
     }
 
-    /**
-     * GET /api/usuarios/username/{username}
-     * Retorna un usuario buscándolo por su username.
-     */
     @GetMapping("/username/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Usuario> getUsuarioByUsername(@PathVariable String username) {
-        Usuario usuario = usuarioService.getUsuarioByUsername(username);
-        return (usuario != null)
-                ? ResponseEntity.ok(usuario)
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<UsuarioDTO> getUsuarioByUsername(@PathVariable String username) {
+        Usuario usuario = usuarioService.obtenerUsuarioPorUsername(username);
+        return ResponseEntity.ok(UsuarioMapper.toDTO(usuario));
     }
 
-    /**
-     * POST /api/usuarios
-     * Crea un nuevo usuario.
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> crearUsuario(@RequestBody Usuario usuario) {
-        // Comprobamos username duplicado
         if (usuarioService.existePorUsername(usuario.getUsername())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario en uso");
-        }else{
-            Usuario creado = usuarioService.crearUsuario(usuario);
+        } else {
+            usuarioService.crearUsuario(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body("usuario creado");
         }
-
     }
 
-    /**
-     * Registra o crea un nuevo usuario de forma pública.
-     * Fuerza admin=false para que nadie se dé de alta como administrador.
-     *
-     * @param usuario Objeto Usuario con los datos (JSON).
-     * @param result BindingResult para validaciones.
-     * @return Respuesta con el usuario creado o errores de validación.
-     */
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody Usuario usuario,
-                                              BindingResult result) {
-        if (result.hasErrors()) {
-            return validation(result);
-        }
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioRequestDTO dto, BindingResult result) {
+        if (result.hasErrors()) return validation(result);
 
-        // Forzamos para que no pueda autoproclamarse admin
-        usuario.setAdmin(false);
-
-
-        // Comprobamos username duplicado
-        if (usuarioService.existePorUsername(usuario.getUsername())) {
+        if (usuarioService.existePorUsername(dto.getUsername())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("El username ya está en uso.");
         }
 
+        Usuario nuevo = UsuarioMapper.toEntity(dto);
+        nuevo.setAdmin(false); // por seguridad
+        Usuario creado = usuarioService.crearUsuario(nuevo);
 
-        Usuario creado = usuarioService.crearUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioMapper.toDTO(creado));
     }
 
-    /**
-     * PUT /api/usuarios/{id}
-     * Actualiza los datos de un usuario basándonos en su id.
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Integer id,
-                                                     @RequestBody Usuario datosNuevos) {
+    public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable Integer id,
+                                                        @RequestBody Usuario datosNuevos) {
         Usuario actualizado = usuarioService.actualizarUsuario(id, datosNuevos);
-        return ResponseEntity.ok(actualizado);
+        return ResponseEntity.ok(UsuarioMapper.toDTO(actualizado));
     }
 
-    /**
-     * PUT /api/usuarios/username/{username}
-     * Actualiza los datos de un usuario basándonos en su username.
-     */
     @PutMapping("/username/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Usuario> actualizarUsuarioPorUsername(
-            @PathVariable String username,
-            @RequestBody Usuario datosNuevos
-    ) {
+    public ResponseEntity<UsuarioDTO> actualizarUsuarioPorUsername(@PathVariable String username,
+                                                                   @RequestBody Usuario datosNuevos) {
         Usuario actualizado = usuarioService.actualizarUsuarioPorUsuario(username, datosNuevos);
-        return ResponseEntity.ok(actualizado);
+        return ResponseEntity.ok(UsuarioMapper.toDTO(actualizado));
     }
 
-    /**
-     * DELETE /api/usuarios/{id}
-     * Elimina un usuario por su id.
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Integer id) {
         usuarioService.eliminarUsuario(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 
-    /**
-     * DELETE /api/usuarios/username/{username}
-     * Elimina un usuario por su username.
-     */
     @DeleteMapping("/username/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> eliminarUsuarioPorUsername(@PathVariable String username) {
+    public ResponseEntity<String> eliminarUsuarioPorUsername(@PathVariable String username) {
         usuarioService.eliminarUsuarioPorUsername(username);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 }

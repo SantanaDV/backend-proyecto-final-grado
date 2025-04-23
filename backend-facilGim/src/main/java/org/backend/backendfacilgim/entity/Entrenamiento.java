@@ -10,8 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "entrenamiento")
@@ -24,9 +24,6 @@ public class Entrenamiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_entrenamiento")
     private Integer idEntrenamiento;
-
-
-
 
     @NotBlank(message = "El nombre del entrenamiento es obligatorio")
     private String nombre;
@@ -52,6 +49,5 @@ public class Entrenamiento {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "entrenamiento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("entrenamiento")
-    private List<Ejercicio> ejercicios = new ArrayList<>();
+    private Set<EntrenamientoEjercicio> entrenamientoEjercicios = new HashSet<>();
 }

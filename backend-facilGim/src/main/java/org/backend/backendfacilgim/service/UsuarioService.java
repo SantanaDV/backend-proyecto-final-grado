@@ -4,104 +4,96 @@ import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.exception.CustomException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UsuarioService {
 
-    //GET
+    // GET
 
     /**
-     * Retorna un usuario por el Id;
+     * Retorna un usuario por su ID.
      *
-     * @param usuarioId
-     * @return Un objeto Usuario
+     * @param usuarioId ID del usuario
+     * @return Objeto Usuario
      */
     Usuario getUsuario(Integer usuarioId);
 
-
     /**
-     * Retorna un usuario buscándolo por el nombre
+     * Lista todos los usuarios registrados.
      *
-     * @param nombreUsuario
-     * @return Un objeto Usuario
-     */
-    Usuario getUsuarioByUsername(String nombreUsuario);
-
-    /**
-     * Lista todos los usuarios
-     *
-     * @return List<Usuario>
+     * @return Lista de usuarios
      */
     List<Usuario> listarUsuarios();
-    //POST
 
     /**
-     * Retorna un objeto usuario que ha sido introduce mediante un Json
+     * Busca un usuario por su nombre de usuario.
      *
-     * @param usuario
-     * @return objeto Usuario
+     * @param username Nombre de usuario
+     * @return Usuario encontrado
+     * @throws CustomException si no se encuentra el usuario
      */
-    Usuario crearUsuario(Usuario usuario);
-
-
-    //PUT
-
-    /**
-     * Actualiza los datos de un usuario basándonos en su id
-     *
-     * @param usuarioId
-     * @param datosNuevos
-     * @return
-     */
-    Usuario actualizarUsuario(Integer usuarioId, Usuario datosNuevos);
-
-    /**
-     * Actualiza los datos de un usuario basándonos en su username
-     *
-     * @param username
-     * @param datosNuevos
-     * @return
-     */
-    Usuario actualizarUsuarioPorUsuario(String username, Usuario datosNuevos);
-
-
-    //DELETE
-
-    /**
-     * Eliminar un usuario por su id
-     *
-     * @param id
-     */
-    void eliminarUsuario(Integer id);
-
-    /**
-     * Eliminar un usuario por su nombre
-     * @param username
-     */
-    void eliminarUsuarioPorUsername(String username);
+    Usuario obtenerUsuarioPorUsername(String username);
 
     /**
      * Verifica si existe un usuario con el username especificado.
-     * @param username El nombre de usuario que se desea comprobar.
-     * @return true si ya existe, false si no.
+     *
+     * @param username El nombre de usuario a comprobar
+     * @return true si ya existe, false si no
      */
     boolean existePorUsername(String username);
 
     /**
-     * Verifica si ya existe al menos un usuario con el rol de ADMIN.
-     * @return true si hay al menos un ADMIN registrado, false si no.
+     * Verifica si ya existe al menos un usuario con rol de ADMIN.
+     *
+     * @return true si hay un admin, false en caso contrario
      */
     boolean existeAdmin();
 
 
+    // POST
+
     /**
-     * Busca un usuario en la base de datos a partir de su nombre de usuario (username).
+     * Crea un nuevo usuario a partir de un objeto JSON recibido.
      *
-     * @param username Nombre de usuario único registrado en el sistema.
-     * @return El objeto Usuario correspondiente al username, si existe.
-     * @throws CustomException Si el usuario no es encontrado en la base de datos.
+     * @param usuario Objeto Usuario recibido
+     * @return Usuario creado
      */
-    Usuario obtenerUsuarioPorUsername(String username);
+    Usuario crearUsuario(Usuario usuario);
 
 
+    // PUT
+
+    /**
+     * Actualiza los datos de un usuario por su ID.
+     *
+     * @param usuarioId ID del usuario a actualizar
+     * @param datosNuevos Nuevos datos del usuario
+     * @return Usuario actualizado
+     */
+    Usuario actualizarUsuario(Integer usuarioId, Usuario datosNuevos);
+
+    /**
+     * Actualiza los datos de un usuario por su nombre de usuario.
+     *
+     * @param username Nombre de usuario
+     * @param datosNuevos Nuevos datos
+     * @return Usuario actualizado
+     */
+    Usuario actualizarUsuarioPorUsuario(String username, Usuario datosNuevos);
+
+
+    // DELETE
+
+    /**
+     * Elimina un usuario por su ID.
+     *
+     * @param id ID del usuario a eliminar
+     */
+    void eliminarUsuario(Integer id);
+
+    /**
+     * Elimina un usuario por su nombre de usuario.
+     *
+     * @param username Username del usuario
+     */
+    void eliminarUsuarioPorUsername(String username);
 }

@@ -1,7 +1,9 @@
 package org.backend.backendfacilgim.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
  * DTO utilizado para recibir datos en el POST de entrenamiento.
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class EntrenamientoDTO {
 
     @NotBlank(message = "El nombre del entrenamiento es obligatorio")

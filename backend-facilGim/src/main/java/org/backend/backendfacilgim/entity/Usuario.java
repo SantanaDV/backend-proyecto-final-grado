@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuario")
 @Data //Genera mediante lombok getters, setters, toString, equals y hasCode
 @NoArgsConstructor //Genera un constructor sin argumentos mediante lombok
 @AllArgsConstructor //Genera un constructor con todos los argumentos
@@ -73,6 +73,13 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Entrenamiento> entrenamientos = new ArrayList<>();
+
+    public Usuario(int i, String user, String pass, String mail) {
+        this.idUsuario = i;
+        this.username = user;
+        this.password = pass;
+        this.correo = mail;
+    }
 
 
     //  Método para limpiar las relaciones ANTES de eliminar el usuario

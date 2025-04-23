@@ -1,13 +1,15 @@
 package org.backend.backendfacilgim.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "ejercicio")
@@ -32,9 +34,7 @@ public class Ejercicio {
 
     private String imagenUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "id_entrenamiento", nullable = false)
-    @JsonIgnoreProperties("ejercicios")
-    @NotNull(message = "El entrenamiento asociado es obligatorio")
-    private Entrenamiento entrenamiento;
+    @OneToMany(mappedBy = "ejercicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<EntrenamientoEjercicio> entrenamientoEjercicios = new HashSet<>();
 }
