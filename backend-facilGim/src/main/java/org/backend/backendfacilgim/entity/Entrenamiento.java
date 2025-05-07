@@ -1,5 +1,6 @@
 package org.backend.backendfacilgim.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -49,5 +50,6 @@ public class Entrenamiento {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "entrenamiento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<EntrenamientoEjercicio> entrenamientoEjercicios = new HashSet<>();
 }

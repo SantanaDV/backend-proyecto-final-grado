@@ -19,115 +19,132 @@ import java.util.stream.Collectors;
 @Service
 public class EjercicioServiceImpl implements EjercicioService {
 
-    private final EntrenamientoRepository entrenamientoRepository;
-    private final EjercicioRepository ejercicioRepository;
-    private final EntrenamientoEjercicioRepository entrenamientoEjercicioRepository;
+    private final EntrenamientoRepository entrenamientoRepo;
+    private final EjercicioRepository ejercicioRepo;
+    private final EntrenamientoEjercicioRepository relRepo;
 
     public EjercicioServiceImpl(
-            EntrenamientoRepository entrenamientoRepository,
-            EjercicioRepository ejercicioRepository,
-            EntrenamientoEjercicioRepository entrenamientoEjercicioRepository
+            EntrenamientoRepository entrenamientoRepo,
+            EjercicioRepository ejercicioRepo,
+            EntrenamientoEjercicioRepository relRepo
     ) {
-        this.entrenamientoRepository = entrenamientoRepository;
-        this.ejercicioRepository = ejercicioRepository;
-        this.entrenamientoEjercicioRepository = entrenamientoEjercicioRepository;
+        this.entrenamientoRepo = entrenamientoRepo;
+        this.ejercicioRepo = ejercicioRepo;
+        this.relRepo = relRepo;
+    }
+
+    // --- Catálogo: CRUD puro sobre Ejercicio ---
+
+    @Override
+    public List<Ejercicio> listarEjercicios() {
+        return ejercicioRepo.findAll();
     }
 
     @Override
     public Optional<Ejercicio> getEjercicio(Integer ejercicioId) {
-        return ejercicioRepository.findById(ejercicioId);
+        return ejercicioRepo.findById(ejercicioId);
     }
 
     @Override
-    public Optional<Ejercicio> getEjercicioByNombre(String nombreEjercicio) {
-        Ejercicio ejercicio = ejercicioRepository.findByNombre(nombreEjercicio);
-        if (ejercicio == null) {
-            throw new CustomException("Ejercicio no encontrado por nombre: " + nombreEjercicio);
-        }
-        return Optional.of(ejercicio);
+    public Ejercicio crearEjercicio(Ejercicio dto) {
+        Ejercicio e = new Ejercicio();
+        e.setNombre(dto.getNombre());
+        e.setImagenUrl(dto.getImagenUrl());
+        return ejercicioRepo.save(e);
     }
 
     @Override
-    public List<Ejercicio> listarEjercicios() {
-        return ejercicioRepository.findAll();
+    public Ejercicio actualizarEjercicio(Integer id, Ejercicio datos) {
+        Ejercicio e = ejercicioRepo.findById(id)
+                .orElseThrow(() -> new CustomException("Ejercicio no encontrado: " + id));
+        e.setNombre(datos.getNombre());
+        e.setImagenUrl(datos.getImagenUrl());
+        return ejercicioRepo.save(e);
     }
 
     @Override
-    public List<EjercicioDTO> listarEjerciciosPorEntrenamientoYUsuario(Integer idEntrenamiento, String username) {
-        Entrenamiento entrenamiento = entrenamientoRepository.findById(idEntrenamiento)
-                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado"));
-
-        if (!entrenamiento.getUsuario().getUsername().equals(username)) {
-            throw new CustomException("Este entrenamiento no pertenece al usuario");
-        }
-
-        List<EntrenamientoEjercicio> relaciones = entrenamientoEjercicioRepository.findByEntrenamiento(entrenamiento);
-
-        return relaciones.stream()
-                .map(rel -> EjercicioMapper.toDTO(rel.getEjercicio(), rel))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Ejercicio crearEjercicio(Ejercicio ejercicio) {
-        return ejercicioRepository.save(ejercicio);
-    }
-
-    @Override
-    public Ejercicio actualizarEjercicio(Integer ejercicioId, Ejercicio datosNuevos) {
-        Ejercicio ejercicio = ejercicioRepository.findById(ejercicioId)
-                .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + ejercicioId));
-
-        ejercicio.setNombre(datosNuevos.getNombre());
-        ejercicio.setPeso(datosNuevos.getPeso());
-        ejercicio.setRepeticiones(datosNuevos.getRepeticiones());
-        ejercicio.setImagenUrl(datosNuevos.getImagenUrl());
-
-        return ejercicioRepository.save(ejercicio);
-    }
-
-    @Override
-    public Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String username) {
-        Ejercicio ejercicio = ejercicioRepository.findByNombre(nombreEjercicio);
-        if (ejercicio == null) {
-            throw new CustomException("No se encontró el ejercicio con nombre: " + nombreEjercicio);
-        }
-
-        boolean perteneceAlUsuario = entrenamientoEjercicioRepository
-                .findByEjercicio_IdEjercicio(ejercicio.getIdEjercicio())
-                .stream()
-                .anyMatch(rel -> rel.getEntrenamiento().getUsuario().getUsername().equals(username));
-
-        if (!perteneceAlUsuario) {
-            throw new CustomException("No tienes permiso para modificar este ejercicio.");
-        }
-
-        return actualizarEjercicio(ejercicio.getIdEjercicio(), datosNuevos);
-    }
-
-    @Override
-    public void eliminarEjercicio(Integer ejercicioId) {
-        Ejercicio ejercicio = ejercicioRepository.findById(ejercicioId)
-                .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + ejercicioId));
-        ejercicioRepository.delete(ejercicio);
+    public void eliminarEjercicio(Integer id) {
+        Ejercicio e = ejercicioRepo.findById(id)
+                .orElseThrow(() -> new CustomException("Ejercicio no encontrado: " + id));
+        ejercicioRepo.delete(e);
     }
 
     @Override
     public void eliminarEjercicioPorNombre(String nombreEjercicio, String username) {
-        Ejercicio ejercicio = ejercicioRepository.findByNombre(nombreEjercicio);
-        if (ejercicio == null) {
-            throw new CustomException("No se encontró el ejercicio con nombre: " + nombreEjercicio);
+        Ejercicio e = ejercicioRepo.findByNombre(nombreEjercicio);
+        if (e == null) {
+            throw new CustomException("Ejercicio no encontrado por nombre: " + nombreEjercicio);
         }
-
-        boolean perteneceAlUsuario = entrenamientoEjercicioRepository
-                .findByEjercicio_IdEjercicio(ejercicio.getIdEjercicio())
+        boolean pertenece = relRepo.findByEjercicio_IdEjercicio(e.getIdEjercicio())
                 .stream()
                 .anyMatch(rel -> rel.getEntrenamiento().getUsuario().getUsername().equals(username));
-
-        if (!perteneceAlUsuario) {
+        if (!pertenece) {
             throw new CustomException("No tienes permiso para eliminar este ejercicio.");
         }
+        ejercicioRepo.delete(e);
+    }
 
-        ejercicioRepository.deleteByNombre(nombreEjercicio);
+    // --- Instancias: operaciones sobre EntrenamientoEjercicio ---
+
+    @Override
+    public EjercicioDTO asignarEjercicioAEntrenamiento(
+            Integer idEntrenamiento,
+            Integer idEjercicio,
+            double peso,
+            int repeticiones,
+            Integer orden
+    ) {
+        Entrenamiento t = entrenamientoRepo.findById(idEntrenamiento)
+                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado: " + idEntrenamiento));
+        Ejercicio ej = ejercicioRepo.findById(idEjercicio)
+                .orElseThrow(() -> new CustomException("Ejercicio no encontrado: " + idEjercicio));
+
+        EntrenamientoEjercicio rel = new EntrenamientoEjercicio();
+        rel.setEntrenamiento(t);
+        rel.setEjercicio(ej);
+        rel.setPeso(peso);
+        rel.setRepeticiones(repeticiones);
+        rel.setOrden(orden);
+
+        rel = relRepo.save(rel);
+        return EjercicioMapper.toDTO(ej, rel);
+    }
+
+    @Override
+    public EjercicioDTO actualizarInstancia(
+            Integer relId,
+            double peso,
+            int repeticiones,
+            Integer orden
+    ) {
+        EntrenamientoEjercicio rel = relRepo.findById(relId)
+                .orElseThrow(() -> new CustomException("Instancia no encontrada: " + relId));
+        rel.setPeso(peso);
+        rel.setRepeticiones(repeticiones);
+        rel.setOrden(orden);
+        rel = relRepo.save(rel);
+        return EjercicioMapper.toDTO(rel.getEjercicio(), rel);
+    }
+
+    @Override
+    public void eliminarInstancia(Integer relId) {
+        EntrenamientoEjercicio rel = relRepo.findById(relId)
+                .orElseThrow(() -> new CustomException("Instancia no encontrada: " + relId));
+        relRepo.delete(rel);
+    }
+
+    @Override
+    public List<EjercicioDTO> listarEjerciciosPorEntrenamientoYUsuario(
+            Integer idEntrenamiento,
+            String username
+    ) {
+        Entrenamiento t = entrenamientoRepo.findById(idEntrenamiento)
+                .orElseThrow(() -> new CustomException("Entrenamiento no encontrado: " + idEntrenamiento));
+        if (!t.getUsuario().getUsername().equals(username)) {
+            throw new CustomException("No tienes permiso sobre este entrenamiento");
+        }
+        return relRepo.findByEntrenamiento(t).stream()
+                .map(rel -> EjercicioMapper.toDTO(rel.getEjercicio(), rel))
+                .collect(Collectors.toList());
     }
 }

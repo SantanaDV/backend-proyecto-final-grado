@@ -2,7 +2,6 @@ package org.backend.backendfacilgim.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,13 +23,8 @@ public class Ejercicio {
     private Integer idEjercicio;
 
     @NotBlank(message = "El nombre del ejercicio es obligatorio")
+    @Column(nullable = false, unique = true)
     private String nombre;
-
-    @Min(value = 1, message = "El número de repeticiones debe ser al menos 1")
-    private int repeticiones;
-
-    @Min(value = 0, message = "El peso no puede ser negativo")
-    private double peso;
 
     private String imagenUrl;
 

@@ -1,4 +1,4 @@
-package org.backend.backendfacilgim.Utilities;
+package org.backend.backendfacilgim.utilities;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

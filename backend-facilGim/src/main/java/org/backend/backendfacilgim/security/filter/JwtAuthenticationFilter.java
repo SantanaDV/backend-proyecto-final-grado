@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.backend.backendfacilgim.dto.LoginResponseDTO;
 import org.backend.backendfacilgim.entity.Usuario;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -18,11 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.backend.backendfacilgim.security.TokenJwtConfig.*;
-
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -47,7 +48,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             throw new AuthenticationServiceException("Error leyendo credenciales", e);
         }
-        // Creamos el token de autenticación
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         return authenticationManager.authenticate(authToken);
@@ -64,34 +64,37 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
 
         String username = userDetails.getUsername();
-        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
 
+        // Lista de roles
+        List<String> roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        // Pasar roles y username en el token
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", roles.stream().map(GrantedAuthority::getAuthority).toList());
-        claims.put("username", username);
-
-
+        // Generación del token JWT
         String token = Jwts.builder()
                 .setSubject(username)
-                .addClaims(claims)  //
+                .claim("authorities", roles)
+                .claim("username", username)
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
                 .signWith(SECRET_KEY)
                 .compact();
 
+        // Construcción del DTO para la respuesta
+        LoginResponseDTO loginResponse = new LoginResponseDTO(
+                "Has iniciado sesión con éxito!",
+                token,
+                username,
+                roles
+        );
 
-        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
-
-        Map<String, String> body = new HashMap<>();
-        body.put("token", token);
-        body.put("username", username);
-        body.put("mensaje", "Has iniciado sesión con éxito!");
-
-
-        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+        // Serializamos el DTO a JSON y lo enviamos
         response.setContentType(CONTENT_TYPE);
         response.setStatus(HttpServletResponse.SC_OK);
+        new ObjectMapper().writeValue(response.getWriter(), loginResponse);
+
+        // También añadimos el header Authorization
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
     }
 
     @Override
@@ -99,12 +102,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                               HttpServletResponse response,
                                               AuthenticationException failed)
             throws IOException, ServletException {
-        Map<String, String> body = new HashMap<>();
-        body.put("message", "Error en la autenticación, usuario o password incorrectos!");
-        body.put("error", failed.getMessage());
-
-        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(CONTENT_TYPE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        Map<String, String> body = Map.of(
+                "message", "Error en la autenticación, usuario o password incorrectos!",
+                "error", failed.getMessage()
+        );
+        new ObjectMapper().writeValue(response.getWriter(), body);
     }
 }

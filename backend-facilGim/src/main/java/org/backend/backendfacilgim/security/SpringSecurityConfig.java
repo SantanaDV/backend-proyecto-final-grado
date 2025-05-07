@@ -78,7 +78,7 @@ public class SpringSecurityConfig {
 
 
                         .requestMatchers(HttpMethod.POST, "/login", "/api/usuarios/registrar").permitAll()
-                                .anyRequest().permitAll()
+
 
 
                         // Cualquier otra ruta requiere autenticación

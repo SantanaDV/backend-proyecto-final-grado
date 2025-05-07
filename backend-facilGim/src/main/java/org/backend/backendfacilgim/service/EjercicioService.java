@@ -8,25 +8,47 @@ import java.util.Optional;
 
 public interface EjercicioService {
 
-    Optional<Ejercicio> getEjercicio(Integer ejercicioId);
+    // —— Catálogo global ——
 
-    Optional<Ejercicio> getEjercicioByNombre(String nombreEjercicio);
-
+    /** Devuelve todos los ejercicios del catálogo */
     List<Ejercicio> listarEjercicios();
 
+    /** Busca un ejercicio por su id */
+    Optional<Ejercicio> getEjercicio(Integer ejercicioId);
+
+    /** Crea un ejercicio en el catálogo */
     Ejercicio crearEjercicio(Ejercicio ejercicio);
 
+    /** Actualiza un ejercicio existente */
     Ejercicio actualizarEjercicio(Integer ejercicioId, Ejercicio datosNuevos);
 
-    Ejercicio actualizarEjercicioPorNombre(String nombreEjercicio, Ejercicio datosNuevos, String username);
+    /** Elimina un ejercicio por su id */
+    void eliminarEjercicio(Integer ejercicioId);
 
-    void eliminarEjercicio(Integer id);
+    /** Elimina un ejercicio por su nombre, validando propietario */
+    void eliminarEjercicioPorNombre(String nombreEjercicio, String username);
 
-    void eliminarEjercicioPorNombre(String nombre, String username);
+    // —— Instancias en entrenamientos ——
+
+    EjercicioDTO asignarEjercicioAEntrenamiento(
+            Integer idEntrenamiento,
+            Integer idEjercicio,
+            double peso,
+            int repeticiones,
+            Integer orden
+    );
+
+    EjercicioDTO actualizarInstancia(
+            Integer relId,
+            double peso,
+            int repeticiones,
+            Integer orden
+    );
+
+    void eliminarInstancia(Integer relId);
 
     /**
-     * Lista los ejercicios que pertenecen a un entrenamiento y a un usuario,
-     * utilizando la entidad intermedia EntrenamientoEjercicio.
+     * Lista los ejercicios (instancias) para un entrenamiento y usuario dados.
      */
     List<EjercicioDTO> listarEjerciciosPorEntrenamientoYUsuario(Integer idEntrenamiento, String username);
 }

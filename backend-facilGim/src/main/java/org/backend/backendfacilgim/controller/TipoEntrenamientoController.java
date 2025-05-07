@@ -1,7 +1,7 @@
 package org.backend.backendfacilgim.controller;
 
 import jakarta.validation.Valid;
-import org.backend.backendfacilgim.Utilities.Utils;
+import org.backend.backendfacilgim.utilities.Utils;
 import org.backend.backendfacilgim.dto.TipoEntrenamientoDTO;
 import org.backend.backendfacilgim.entity.TipoEntrenamiento;
 import org.backend.backendfacilgim.mapper.TipoEntrenamientoMapper;

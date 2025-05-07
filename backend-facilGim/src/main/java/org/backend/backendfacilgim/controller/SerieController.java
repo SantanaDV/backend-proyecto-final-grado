@@ -1,7 +1,7 @@
 package org.backend.backendfacilgim.controller;
 
 import jakarta.validation.Valid;
-import org.backend.backendfacilgim.Utilities.Utils;
+import org.backend.backendfacilgim.utilities.Utils;
 import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.Serie;
 import org.backend.backendfacilgim.mapper.SerieMapper;

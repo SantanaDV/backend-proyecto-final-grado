@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.backend.backendfacilgim.Utilities.Utils.validation;
+import static org.backend.backendfacilgim.utilities.Utils.validation;
 
 @RestController
 @RequestMapping("/api/usuarios")
