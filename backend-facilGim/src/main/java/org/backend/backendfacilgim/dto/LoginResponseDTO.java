@@ -14,4 +14,5 @@ public class LoginResponseDTO {
     private String token;
     private String username;
     private List<String> authorities;
+    private Integer userId;
 }

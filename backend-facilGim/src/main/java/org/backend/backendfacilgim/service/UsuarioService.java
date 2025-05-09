@@ -33,6 +33,8 @@ public interface UsuarioService {
      */
     Usuario obtenerUsuarioPorUsername(String username);
 
+    Usuario actualizarContraseña(Integer id, String nuevaContraseña);
+
     /**
      * Verifica si existe un usuario con el username especificado.
      *

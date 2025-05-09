@@ -1,9 +1,7 @@
 package org.backend.backendfacilgim.testController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.backend.backendfacilgim.controller.UsuarioController;
 import org.backend.backendfacilgim.dto.UsuarioDTO;
-import org.backend.backendfacilgim.dto.UsuarioRequestDTO;
 import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,7 +109,7 @@ class UsuarioControllerTest {
     @Test
     @WithAnonymousUser
     void POST_RegistrarUsuario_Publico() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO();
+        UsuarioDTO requestDTO = new UsuarioDTO();
         requestDTO.setUsername("nuevo");
         requestDTO.setPassword("1234@ABC");
         requestDTO.setCorreo("nuevo@test.com");

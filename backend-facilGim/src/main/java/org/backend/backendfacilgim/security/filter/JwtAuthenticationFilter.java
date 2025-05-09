@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.backend.backendfacilgim.dto.LoginResponseDTO;
 import org.backend.backendfacilgim.entity.Usuario;
+import org.backend.backendfacilgim.service.UsuarioService;    // <—
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,11 +29,14 @@ import static org.backend.backendfacilgim.security.TokenJwtConfig.*;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final UsuarioService usuarioService;  // <—
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
+                                   UsuarioService usuarioService) {
         super(authenticationManager);
         super.setFilterProcessesUrl("/login");
         this.authenticationManager = authenticationManager;
+        this.usuarioService = usuarioService;    // <—
     }
 
     @Override
@@ -80,12 +84,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .signWith(SECRET_KEY)
                 .compact();
 
-        // Construcción del DTO para la respuesta
+        // **Obtenemos el Usuario completo para sacar su ID**
+        Usuario usuarioEntity = usuarioService.obtenerUsuarioPorUsername(username);
+        Integer userId = usuarioEntity.getIdUsuario();
+
+        // Construcción del DTO para la respuesta, ahora con userId
         LoginResponseDTO loginResponse = new LoginResponseDTO(
                 "Has iniciado sesión con éxito!",
                 token,
                 username,
-                roles
+                roles,
+                userId                                 // <—
         );
 
         // Serializamos el DTO a JSON y lo enviamos

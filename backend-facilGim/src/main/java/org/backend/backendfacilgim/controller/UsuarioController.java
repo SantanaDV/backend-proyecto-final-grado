@@ -2,7 +2,6 @@ package org.backend.backendfacilgim.controller;
 
 import jakarta.validation.Valid;
 import org.backend.backendfacilgim.dto.UsuarioDTO;
-import org.backend.backendfacilgim.dto.UsuarioRequestDTO;
 import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.mapper.UsuarioMapper;
 import org.backend.backendfacilgim.service.UsuarioService;
@@ -62,7 +61,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioRequestDTO dto, BindingResult result) {
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioDTO dto, BindingResult result) {
         if (result.hasErrors()) return validation(result);
 
         if (usuarioService.existePorUsername(dto.getUsername())) {
@@ -92,6 +91,18 @@ public class UsuarioController {
         Usuario actualizado = usuarioService.actualizarUsuarioPorUsuario(username, datosNuevos);
         return ResponseEntity.ok(UsuarioMapper.toDTO(actualizado));
     }
+    @PutMapping("/password/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<UsuarioDTO> actualizarContraseña(@PathVariable Integer id,
+                                                           @RequestBody String newPassword) {
+        Usuario usuario = usuarioService.getUsuario(id);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        usuario.setPassword(newPassword);  // Establece la nueva contraseña
+        Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
+        return ResponseEntity.ok(UsuarioMapper.toDTO(actualizado));
+    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -106,4 +117,5 @@ public class UsuarioController {
         usuarioService.eliminarUsuarioPorUsername(username);
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
+
 }

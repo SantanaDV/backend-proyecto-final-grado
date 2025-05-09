@@ -96,6 +96,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Usuario actualizarContraseña(Integer id, String nuevaContraseña) {
+        Usuario usuario = getUsuario(id); // Obtener el usuario por ID
+        usuario.setPassword(passwordEncoder.encode(nuevaContraseña)); // Cifrar la nueva contraseña
+        return usuarioRepository.save(usuario); // Guardar el usuario con la nueva contraseña
+    }
+
+    @Override
     public boolean existePorUsername(String username) {
         return usuarioRepository.existsByUsername(username);
     }
