@@ -2,9 +2,7 @@ package org.backend.backendfacilgim.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import org.backend.backendfacilgim.dto.AsignacionDTO;
-import org.backend.backendfacilgim.dto.EjercicioDTO;
-import org.backend.backendfacilgim.dto.EjercicioDeleteDTO;
+import org.backend.backendfacilgim.dto.*;
 import org.backend.backendfacilgim.entity.Ejercicio;
 import org.backend.backendfacilgim.exception.CustomException;
 import org.backend.backendfacilgim.service.EjercicioService;
@@ -12,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -92,15 +91,14 @@ public class EjercicioController {
      * Asigna un ejercicio del catálogo a un entrenamiento con sus datos específicos.
      */
     @PostMapping("/entrenamiento/{idEntrenamiento}/asignar")
-    public ResponseEntity<EjercicioDTO> asignarAEentrenamiento(
+    public ResponseEntity<EjercicioDTO> asignarAEentrenamientoConSeries(
             @PathVariable Integer idEntrenamiento,
-            @Valid @RequestBody AsignacionDTO body
+            @Valid @RequestBody AsignacionConSeriesDTO body
     ) {
-        EjercicioDTO dto = ejercicioService.asignarEjercicioAEntrenamiento(
+        EjercicioDTO dto = ejercicioService.asignarEjercicioConSeriesAEntrenamiento(
                 idEntrenamiento,
                 body.getEjercicioId(),
-                body.getPeso(),
-                body.getRepeticiones(),
+                body.getSeries(),
                 body.getOrden()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
@@ -112,12 +110,11 @@ public class EjercicioController {
     @PutMapping("/entrenamiento/ejercicio/{relId}")
     public ResponseEntity<EjercicioDTO> actualizarInstancia(
             @PathVariable Integer relId,
-            @Valid @RequestBody AsignacionDTO body
+            @Valid @RequestBody ActualizacionInstanciaDTO body
     ) {
-        EjercicioDTO dto = ejercicioService.actualizarInstancia(
+        EjercicioDTO dto = ejercicioService.actualizarInstanciaConSeries(
                 relId,
-                body.getPeso(),
-                body.getRepeticiones(),
+                body.getSeries(),
                 body.getOrden()
         );
         return ResponseEntity.ok(dto);
@@ -133,11 +130,16 @@ public class EjercicioController {
     }
 
     private String guardarImagen(MultipartFile imagen) throws IOException {
-        Path uploadDir = Paths.get("src/main/resources/static/uploads/");
-        Files.createDirectories(uploadDir);
+        Path uploadDir = Paths.get("uploads/");
+        Files.createDirectories(uploadDir); // crea si no existe
+
         String filename = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
         Path path = uploadDir.resolve(filename);
         Files.copy(imagen.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        return filename;
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        return baseUrl + "/uploads/" + filename;
     }
+
+
 }

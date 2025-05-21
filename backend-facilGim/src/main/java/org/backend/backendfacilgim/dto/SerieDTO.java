@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class SerieDTO {
 
     private Integer id;
-    private int numeroSerie;
+    private Integer numeroSerie;
     private int repeticiones;
     private double peso;
 }

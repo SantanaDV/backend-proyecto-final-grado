@@ -173,8 +173,8 @@ public class EntrenamientoControllerTest {
         dto.setDescripcion("Entrenamiento de core completo");
         dto.setDuracion(30);
         dto.setFechaEntrenamiento(LocalDate.now());
-        dto.setTipoEntrenamientoId(1L);
-        dto.setUsuarioId(1);
+        //dto.setTipoEntrenamientoId(1L);
+      //  dto.setUsuarioId(1);
         dto.setEjerciciosId(List.of(101)); // Un ejercicio dummy
 
         mockMvc.perform(put("/api/entrenamientos/dto/1")

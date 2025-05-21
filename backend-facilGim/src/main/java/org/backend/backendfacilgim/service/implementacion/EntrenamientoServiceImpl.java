@@ -2,15 +2,17 @@
 package org.backend.backendfacilgim.service.implementacion;
 
 import org.backend.backendfacilgim.dto.EntrenamientoDTO;
+import org.backend.backendfacilgim.dto.EntrenamientoEjercicioDTO;
+import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.*;
 import org.backend.backendfacilgim.exception.CustomException;
 import org.backend.backendfacilgim.repository.*;
 import org.backend.backendfacilgim.service.EntrenamientoService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class EntrenamientoServiceImpl implements EntrenamientoService {
@@ -60,12 +62,6 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return entrenamientoRepository.save(entrenamiento);
     }
 
-    @Override
-    public Entrenamiento crearEntrenamientoDesdeDTO(EntrenamientoDTO dto) {
-        Entrenamiento entrenamiento = new Entrenamiento();
-        rellenarEntrenamientoDesdeDTO(entrenamiento, dto);
-        return entrenamientoRepository.save(entrenamiento);
-    }
 
     @Override
     public Entrenamiento actualizarEntrenamiento(Integer id, Entrenamiento datosNuevos) {
@@ -83,13 +79,77 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return actualizarEntrenamiento(entrenamientos.get(0), datosNuevos);
     }
 
+    // src/main/java/org/backend/backendfacilgim/service/implementacion/EntrenamientoServiceImpl.java
+
     @Override
+    @Transactional
     public Entrenamiento actualizarEntrenamientoDesdeDTO(Integer id, EntrenamientoDTO dto) {
         Entrenamiento existente = entrenamientoRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Entrenamiento no encontrado con ID: " + id));
-        rellenarEntrenamientoDesdeDTO(existente, dto);
+
+        // 1) Campos simples
+        existente.setNombre(dto.getNombre());
+        existente.setDescripcion(dto.getDescripcion());
+        existente.setDuracion(dto.getDuracion());
+        existente.setFechaEntrenamiento(dto.getFechaEntrenamiento());
+
+        // 2) Usuario
+        Usuario usuario = usuarioRepository.findById(dto.getUsuario().getIdUsuario())
+                .orElseThrow(() -> new CustomException("Usuario no encontrado con ID: " + dto.getUsuario().getIdUsuario()));
+        existente.setUsuario(usuario);
+
+        // 3) Tipo
+        TipoEntrenamiento tipo = tipoEntrenamientoRepository.findById(dto.getTipoEntrenamiento().getId())
+                .orElseThrow(() -> new CustomException("Tipo de entrenamiento no encontrado con ID: " + dto.getTipoEntrenamiento().getId()));
+        existente.setTipoEntrenamiento(tipo);
+
+        // 4) Eliminar todas las relaciones antiguas usando orphanRemoval
+        existente.getEntrenamientoEjercicios().clear();
+
+        // 5) Construir NUEVAS relaciones desde el DTO
+        if (dto.getEntrenamientosEjercicios() != null) {
+            for (EntrenamientoEjercicioDTO relDTO : dto.getEntrenamientosEjercicios()) {
+                // 5.1) Recuperar ejercicio
+                Ejercicio ejercicio = ejercicioRepository.findById(relDTO.getEjercicio().getIdEjercicio())
+                        .orElseThrow(() -> new CustomException(
+                                "Ejercicio no encontrado con ID: " + relDTO.getEjercicio().getIdEjercicio()));
+
+                // 5.2) Crear entidad de relación
+                EntrenamientoEjercicio ee = new EntrenamientoEjercicio();
+                ee.setEntrenamiento(existente);
+                ee.setEjercicio(ejercicio);
+                ee.setOrden(relDTO.getOrden());
+
+                // 5.3) Series de esta relación
+                List<Serie> listaSeries = new ArrayList<>();
+                int contadorSerie = 1;
+                if (relDTO.getSeries() != null) {
+                    for (SerieDTO sDTO : relDTO.getSeries()) {
+                        Serie s = new Serie();
+                        // Si DTO trae número de serie, úsalo; sino autoincrementa
+                        s.setNumeroSerie(
+                                sDTO.getNumeroSerie() != null ? sDTO.getNumeroSerie() : contadorSerie++);
+                        s.setRepeticiones(sDTO.getRepeticiones());
+                        s.setPeso(sDTO.getPeso());
+                        // Enlace bidireccional
+                        s.setEntrenamientoEjercicio(ee);
+                        listaSeries.add(s);
+                    }
+                }
+                ee.setSeries(listaSeries);
+
+                // 5.4) Añadir al set del entrenamiento (Hibernate insertará estas nuevas)
+                existente.getEntrenamientoEjercicios().add(ee);
+            }
+        }
+
+        // 6) Guardar TODO de una sola vez: Hibernate borrará los viejos (orphanRemoval)
+        //    y creará los nuevos
         return entrenamientoRepository.save(existente);
     }
+
+
+
 
     @Override
     public void eliminarEntrenamiento(Integer id) {
@@ -123,6 +183,75 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoEjercicioRepository.delete(rel);
     }
 
+    @Override
+    @Transactional
+    public Entrenamiento crearDesdeDTO(EntrenamientoDTO dto) {
+        Entrenamiento entrenamiento = new Entrenamiento();
+
+        entrenamiento.setNombre(dto.getNombre());
+        entrenamiento.setDescripcion(dto.getDescripcion());
+        entrenamiento.setDuracion(dto.getDuracion());
+        entrenamiento.setFechaEntrenamiento(dto.getFechaEntrenamiento());
+
+        Usuario usuario = usuarioRepository.findById(dto.getUsuario().getIdUsuario())
+                .orElseThrow(() -> new CustomException("Usuario no encontrado"));
+        entrenamiento.setUsuario(usuario);
+
+        TipoEntrenamiento tipo = tipoEntrenamientoRepository.findById(dto.getTipoEntrenamiento().getId())
+                .orElseThrow(() -> new CustomException("Tipo de entrenamiento no encontrado"));
+        entrenamiento.setTipoEntrenamiento(tipo);
+
+        // Preparamos las relaciones fuera del set original
+        Set<EntrenamientoEjercicio> relaciones = new HashSet<>();
+
+        if (dto.getEntrenamientosEjercicios() != null) {
+            for (EntrenamientoEjercicioDTO relDTO : dto.getEntrenamientosEjercicios()) {
+
+                Integer idEjercicio = relDTO.getEjercicio().getIdEjercicio();
+                Ejercicio ejercicio = ejercicioRepository.findById(idEjercicio)
+                        .orElseThrow(() -> new CustomException("Ejercicio no encontrado"));
+
+                EntrenamientoEjercicio ee = new EntrenamientoEjercicio();
+                ee.setEntrenamiento(entrenamiento);
+                ee.setEjercicio(ejercicio);
+                ee.setOrden(relDTO.getOrden());
+
+                List<Serie> series = new ArrayList<>();
+                int numeroSerie = 1;
+
+                if (relDTO.getSeries() != null) {
+                    for (SerieDTO serieDTO : relDTO.getSeries()) {
+                        Serie serie = new Serie();
+                        serie.setNumeroSerie(serieDTO.getNumeroSerie() != null ? serieDTO.getNumeroSerie() : numeroSerie++);
+                        serie.setRepeticiones(serieDTO.getRepeticiones());
+                        serie.setPeso(serieDTO.getPeso());
+                        serie.setEntrenamientoEjercicio(ee);
+                        series.add(serie);
+                    }
+                }
+
+                ee.setSeries(series);
+                relaciones.add(ee);
+            }
+        }
+
+        // Solo una vez construidas todas, se asigna el set
+        entrenamiento.setEntrenamientoEjercicios(relaciones);
+
+        return entrenamientoRepository.save(entrenamiento);
+    }
+
+
+
+
+    @Override
+    public List<Entrenamiento> encontrarEntrenamientoPorIdUsuario(Integer usuarioIdUsuario) {
+
+        if(entrenamientoRepository.findEntrenamientosByUsuario_IdUsuario(usuarioIdUsuario).isEmpty())
+            return List.of();
+        return entrenamientoRepository.findEntrenamientosByUsuario_IdUsuario(usuarioIdUsuario);
+    }
+
     private Entrenamiento actualizarEntrenamiento(Entrenamiento entrenamientoEncontrado, Entrenamiento entrenamientoDatosNuevos) {
         entrenamientoEncontrado.setFechaEntrenamiento(entrenamientoDatosNuevos.getFechaEntrenamiento());
         entrenamientoEncontrado.setTipoEntrenamiento(entrenamientoDatosNuevos.getTipoEntrenamiento());
@@ -133,28 +262,5 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return entrenamientoRepository.save(entrenamientoEncontrado);
     }
 
-    private void rellenarEntrenamientoDesdeDTO(Entrenamiento entrenamiento, EntrenamientoDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new CustomException("Usuario no encontrado con ID: " + dto.getUsuarioId()));
 
-        TipoEntrenamiento tipo = tipoEntrenamientoRepository.findById(dto.getTipoEntrenamientoId())
-                .orElseThrow(() -> new CustomException("Tipo de entrenamiento no encontrado con ID: " + dto.getTipoEntrenamientoId()));
-
-        List<EntrenamientoEjercicio> relaciones = dto.getEjerciciosId().stream().map(id -> {
-            Ejercicio ejercicio = ejercicioRepository.findById(id)
-                    .orElseThrow(() -> new CustomException("Ejercicio no encontrado con ID: " + id));
-            EntrenamientoEjercicio ee = new EntrenamientoEjercicio();
-            ee.setEntrenamiento(entrenamiento);
-            ee.setEjercicio(ejercicio);
-            return ee;
-        }).collect(Collectors.toList());
-
-        entrenamiento.setNombre(dto.getNombre());
-        entrenamiento.setDescripcion(dto.getDescripcion());
-        entrenamiento.setFechaEntrenamiento(dto.getFechaEntrenamiento());
-        entrenamiento.setDuracion(dto.getDuracion());
-        entrenamiento.setUsuario(usuario);
-        entrenamiento.setTipoEntrenamiento(tipo);
-        entrenamiento.setEntrenamientoEjercicios(new HashSet<>(relaciones));
-    }
 }

@@ -41,16 +41,16 @@ public class EntrenamientoEjercicioController {
         return ResponseEntity.ok(entrenamientoEjercicioService.obtenerPorId(id));
     }
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<EntrenamientoEjercicio> crear(@Valid @RequestBody EntrenamientoEjercicioDTO dto) {
         Entrenamiento entrenamiento = entrenamientoService.obtenerEntrenamientoPorId(dto.getIdEntrenamiento())
                 .orElseThrow(() -> new RuntimeException("Entrenamiento no encontrado"));
-        Ejercicio ejercicio = ejercicioService.getEjercicio(dto.getIdEjercicio())
+        Ejercicio ejercicio = ejercicioService.getEjercicio(dto.getEjercicio().getIdEjercicio())
                 .orElseThrow(() -> new RuntimeException("Ejercicio no encontrado"));
 
         EntrenamientoEjercicio entity = EntrenamientoEjercicioMapper.fromDTO(dto, entrenamiento, ejercicio);
         return ResponseEntity.ok(entrenamientoEjercicioService.crear(entity));
-    }
+    }*/
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {

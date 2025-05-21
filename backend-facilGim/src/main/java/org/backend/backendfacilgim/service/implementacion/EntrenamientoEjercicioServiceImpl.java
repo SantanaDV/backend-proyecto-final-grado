@@ -40,7 +40,7 @@ public class EntrenamientoEjercicioServiceImpl implements EntrenamientoEjercicio
 
     @Override
     public List<EntrenamientoEjercicio> obtenerPorIdEntrenamiento(Integer idEntrenamiento) {
-        return entrenamientoEjercicioRepository.findByEntrenamiento_IdEntrenamiento(idEntrenamiento);
+        return entrenamientoEjercicioRepository.findByEntrenamiento_IdEntrenamientoOrderByOrdenAsc(idEntrenamiento);
     }
 
     @Override

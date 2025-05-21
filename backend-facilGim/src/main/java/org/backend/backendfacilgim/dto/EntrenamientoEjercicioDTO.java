@@ -12,10 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 public class EntrenamientoEjercicioDTO {
     @NotNull
-    private Integer idEntrenamiento;
-
-    @NotNull
-    private Integer idEjercicio;
+    private EjercicioDTO ejercicio;
+    private int orden;
 
     private List<SerieDTO> series;
 }
+

@@ -1,5 +1,6 @@
 package org.backend.backendfacilgim.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class EntrenamientoDTO {
     private String nombre;
 
     @NotNull(message = "La fecha del entrenamiento es obligatoria")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaEntrenamiento;
 
     @NotBlank(message = "La descripción es obligatoria")
@@ -29,11 +31,12 @@ public class EntrenamientoDTO {
     private int duracion;
 
     @NotNull(message = "El tipo de entrenamiento es obligatorio")
-    private Long tipoEntrenamientoId;
+    private TipoEntrenamientoDTO tipoEntrenamiento;
 
     @NotNull(message = "El usuario es obligatorio")
-    private Integer usuarioId;
+    private UsuarioDTO usuario;
 
     @NotEmpty(message = "Debe haber al menos un ejercicio")
     private List<@NotNull Integer> ejerciciosId;
+    private List<EntrenamientoEjercicioDTO> entrenamientosEjercicios;
 }

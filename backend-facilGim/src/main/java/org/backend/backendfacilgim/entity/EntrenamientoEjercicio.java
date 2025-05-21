@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "entrenamiento_ejercicio")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class EntrenamientoEjercicio {
@@ -32,19 +31,32 @@ public class EntrenamientoEjercicio {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Ejercicio ejercicio;
 
-    @NotNull
-    @Min(value = 0, message = "El peso no puede ser negativo")
-    @Column(nullable = false)
-    private Double peso;
 
-    @NotNull
-    @Min(value = 1, message = "Debe haber al menos una repetición")
-    @Column(nullable = false)
-    private Integer repeticiones;
+
+
 
     /** para ordenar dentro del entrenamiento */
     private Integer orden;
 
     @OneToMany(mappedBy = "entrenamientoEjercicio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Serie> series = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EntrenamientoEjercicio that = (EntrenamientoEjercicio) o;
+
+        // Comparamos por claves compuestas lógicas
+        if (!ejercicio.equals(that.ejercicio)) return false;
+        return entrenamiento.equals(that.entrenamiento);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ejercicio.hashCode();
+        result = 31 * result + entrenamiento.hashCode();
+        return result;
+    }
 }

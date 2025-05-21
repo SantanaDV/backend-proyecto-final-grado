@@ -60,8 +60,6 @@ public interface EntrenamientoService {
      * @param entrenamientoDTO DTO recibido desde frontend
      * @return Entrenamiento creado
      */
-    Entrenamiento crearEntrenamientoDesdeDTO(EntrenamientoDTO entrenamientoDTO);
-
 
     //PUT
 
@@ -112,5 +110,9 @@ public interface EntrenamientoService {
      * @param username
      */
     void quitarEjercicioDeEntrenamiento(Integer idEntrenamiento, Integer idEjercicio, String username) ;
+
+    Entrenamiento crearDesdeDTO(EntrenamientoDTO dto);
+
+    List<Entrenamiento> encontrarEntrenamientoPorIdUsuario(Integer usuarioIdUsuario);
 
 }

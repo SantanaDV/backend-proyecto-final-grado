@@ -1,9 +1,11 @@
 package org.backend.backendfacilgim.service.implementacion;
 
 import org.backend.backendfacilgim.dto.EjercicioDTO;
+import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.Ejercicio;
 import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.backend.backendfacilgim.entity.EntrenamientoEjercicio;
+import org.backend.backendfacilgim.entity.Serie;
 import org.backend.backendfacilgim.exception.CustomException;
 import org.backend.backendfacilgim.mapper.EjercicioMapper;
 import org.backend.backendfacilgim.repository.EntrenamientoEjercicioRepository;
@@ -12,6 +14,7 @@ import org.backend.backendfacilgim.repository.EjercicioRepository;
 import org.backend.backendfacilgim.service.EjercicioService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,7 +61,9 @@ public class EjercicioServiceImpl implements EjercicioService {
         Ejercicio e = ejercicioRepo.findById(id)
                 .orElseThrow(() -> new CustomException("Ejercicio no encontrado: " + id));
         e.setNombre(datos.getNombre());
-        e.setImagenUrl(datos.getImagenUrl());
+        if(datos.getImagenUrl() != null){
+            e.setImagenUrl(datos.getImagenUrl());
+        }
         return ejercicioRepo.save(e);
     }
 
@@ -84,14 +89,10 @@ public class EjercicioServiceImpl implements EjercicioService {
         ejercicioRepo.delete(e);
     }
 
-    // --- Instancias: operaciones sobre EntrenamientoEjercicio ---
-
-    @Override
-    public EjercicioDTO asignarEjercicioAEntrenamiento(
+    public EjercicioDTO asignarEjercicioConSeriesAEntrenamiento(
             Integer idEntrenamiento,
             Integer idEjercicio,
-            double peso,
-            int repeticiones,
+            List<SerieDTO> seriesDTO,
             Integer orden
     ) {
         Entrenamiento t = entrenamientoRepo.findById(idEntrenamiento)
@@ -99,32 +100,37 @@ public class EjercicioServiceImpl implements EjercicioService {
         Ejercicio ej = ejercicioRepo.findById(idEjercicio)
                 .orElseThrow(() -> new CustomException("Ejercicio no encontrado: " + idEjercicio));
 
+        // Crear la entidad relacional
         EntrenamientoEjercicio rel = new EntrenamientoEjercicio();
         rel.setEntrenamiento(t);
         rel.setEjercicio(ej);
-        rel.setPeso(peso);
-        rel.setRepeticiones(repeticiones);
         rel.setOrden(orden);
 
+        // Construir manualmente la lista de series
+        List<Serie> series = new ArrayList<>();
+        int numeroSerie = 1;
+
+        for (SerieDTO dto : seriesDTO) {
+            Serie s = new Serie();
+            s.setPeso(dto.getPeso());
+            s.setRepeticiones(dto.getRepeticiones());
+            s.setNumeroSerie(dto.getNumeroSerie() != null ? dto.getNumeroSerie() : numeroSerie++);
+            s.setEntrenamientoEjercicio(rel); // rel ya existe completamente
+            series.add(s);
+        }
+
+        rel.setSeries(series);
+
+        // Guardar y retornar DTO
         rel = relRepo.save(rel);
         return EjercicioMapper.toDTO(ej, rel);
     }
 
-    @Override
-    public EjercicioDTO actualizarInstancia(
-            Integer relId,
-            double peso,
-            int repeticiones,
-            Integer orden
-    ) {
-        EntrenamientoEjercicio rel = relRepo.findById(relId)
-                .orElseThrow(() -> new CustomException("Instancia no encontrada: " + relId));
-        rel.setPeso(peso);
-        rel.setRepeticiones(repeticiones);
-        rel.setOrden(orden);
-        rel = relRepo.save(rel);
-        return EjercicioMapper.toDTO(rel.getEjercicio(), rel);
-    }
+
+
+
+
+
 
     @Override
     public void eliminarInstancia(Integer relId) {
@@ -147,4 +153,44 @@ public class EjercicioServiceImpl implements EjercicioService {
                 .map(rel -> EjercicioMapper.toDTO(rel.getEjercicio(), rel))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public EjercicioDTO actualizarInstanciaConSeries(
+            Integer relId,
+            List<SerieDTO> seriesDTOs,
+            Integer orden
+    ) {
+        EntrenamientoEjercicio rel = relRepo.findById(relId)
+                .orElseThrow(() -> new CustomException("Instancia no encontrada: " + relId));
+
+        // Limpiar las series actuales
+        rel.getSeries().clear();
+
+        List<Serie> nuevasSeries = new ArrayList<>();
+        int index = 1;
+
+        for (SerieDTO serieDTO : seriesDTOs) {
+            Serie s = new Serie();
+            s.setNumeroSerie(
+                    serieDTO.getNumeroSerie() != null ? serieDTO.getNumeroSerie() : index++
+            );
+            s.setPeso(serieDTO.getPeso());
+            s.setRepeticiones(serieDTO.getRepeticiones());
+            s.setEntrenamientoEjercicio(rel); // Ahora sí, sin error
+            nuevasSeries.add(s);
+        }
+
+        rel.getSeries().addAll(nuevasSeries);
+
+        if (orden != null) {
+            rel.setOrden(orden);
+        }
+
+        // Guardamos la relación actualizada con las nuevas series
+        rel = relRepo.save(rel);
+
+        return EjercicioMapper.toDTO(rel.getEjercicio(), rel);
+    }
+
+
 }

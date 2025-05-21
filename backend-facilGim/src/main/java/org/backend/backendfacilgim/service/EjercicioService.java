@@ -1,6 +1,7 @@
 package org.backend.backendfacilgim.service;
 
 import org.backend.backendfacilgim.dto.EjercicioDTO;
+import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.Ejercicio;
 
 import java.util.List;
@@ -30,20 +31,15 @@ public interface EjercicioService {
 
     // —— Instancias en entrenamientos ——
 
-    EjercicioDTO asignarEjercicioAEntrenamiento(
+    public EjercicioDTO asignarEjercicioConSeriesAEntrenamiento(
             Integer idEntrenamiento,
             Integer idEjercicio,
-            double peso,
-            int repeticiones,
+            List<SerieDTO> seriesDTO,
             Integer orden
     );
 
-    EjercicioDTO actualizarInstancia(
-            Integer relId,
-            double peso,
-            int repeticiones,
-            Integer orden
-    );
+
+
 
     void eliminarInstancia(Integer relId);
 
@@ -51,4 +47,6 @@ public interface EjercicioService {
      * Lista los ejercicios (instancias) para un entrenamiento y usuario dados.
      */
     List<EjercicioDTO> listarEjerciciosPorEntrenamientoYUsuario(Integer idEntrenamiento, String username);
+
+    EjercicioDTO actualizarInstanciaConSeries(Integer relId, List<SerieDTO> series, Integer orden);
 }

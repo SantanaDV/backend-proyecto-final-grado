@@ -42,6 +42,10 @@ public class EntrenamientoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @GetMapping("/usuarioId/{id}")
+    public ResponseEntity<List<Entrenamiento>> obtenerEntrenamientosUsuario(@PathVariable Integer id){
+        return ResponseEntity.ok(entrenamientoService.encontrarEntrenamientoPorIdUsuario(id));
+    }
 
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<List<Entrenamiento>> obtenerEntrenamientosPorNombre(@PathVariable String nombre) {
@@ -50,11 +54,13 @@ public class EntrenamientoController {
 
     @PostMapping
     public ResponseEntity<?> crearEntrenamiento(
-            @Valid @RequestBody Entrenamiento entrenamiento,
+            @Valid @RequestBody EntrenamientoDTO dto,
             BindingResult result) {
         if (result.hasErrors()) return Utils.validation(result);
-        Entrenamiento creado = entrenamientoService.crearEntrenamiento(entrenamiento);
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+
+        Entrenamiento entrenamiento = entrenamientoService.crearDesdeDTO(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(entrenamiento);
     }
 
     @PutMapping("/{id}")

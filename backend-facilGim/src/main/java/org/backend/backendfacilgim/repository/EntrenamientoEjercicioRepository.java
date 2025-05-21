@@ -12,11 +12,13 @@ public interface EntrenamientoEjercicioRepository extends JpaRepository<Entrenam
     List<EntrenamientoEjercicio> findByEjercicio_IdEjercicio(Integer idEjercicio);
 
 
-    List<EntrenamientoEjercicio> findByEntrenamiento_IdEntrenamiento(Integer idEntrenamiento);
+    List<EntrenamientoEjercicio> findByEntrenamiento_IdEntrenamientoOrderByOrdenAsc(Integer idEntrenamiento);
 
 
     List<EntrenamientoEjercicio> findByEntrenamiento(Entrenamiento entrenamiento);
 
     Optional<EntrenamientoEjercicio> findByEntrenamiento_IdEntrenamientoAndEjercicio_IdEjercicio(Integer idEntrenamiento, Integer idEjercicio);
 
+    void deleteAllByEntrenamiento_IdEntrenamiento(Integer idEntrenamiento);
 }
+
