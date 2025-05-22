@@ -69,6 +69,7 @@ public class SpringSecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/api/usuarios/registrar").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
