@@ -8,18 +8,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuración para Springdoc OpenAPI (Swagger).
- * Genera la documentación interactiva en /swagger-ui.html y /api-docs.
+ * Configuración de Springdoc OpenAPI (Swagger) para la aplicación.
+ * <p>
+ * Define los beans necesarios para generar la documentación interactiva
+ * de la API, accesible en {@code /swagger-ui.html} y los endpoints de OpenAPI.
+ * </p>
+ *
+ * Autor: Francisco Santana
  */
 @Configuration
 public class SwaggerConfig {
 
     /**
-     * Define la configuración principal de la documentación de la API:
-     * título, descripción, versión, etc.
+     * Bean principal que configura la información básica de la API:
+     * título, descripción, versión y documentación externa.
+     * <p>
+     * Esta configuración se mostrará en la interfaz de Swagger UI
+     * y en el archivo JSON de OpenAPI disponible en {@code /api-docs}.
+     * </p>
      *
-     * Con este bean, Springdoc construye la documentación OpenAPI
-     * que se mostrará en /swagger-ui.html
+     * @return instancia de {@link OpenAPI} con la información de la API.
      */
     @Bean
     public OpenAPI facilGimOpenAPI() {
@@ -35,11 +43,14 @@ public class SwaggerConfig {
                 );
     }
 
-
     /**
-
-     * Con este bean, se personalizan las rutas que se documentan,
-     * y se asigna un nombre de grupo para diferenciarlas, en este caso api/^^.
+     * Bean que agrupa las rutas que deben incluirse en la documentación pública.
+     * <p>
+     * Define un grupo llamado {@code public-api} que incluirá únicamente
+     * las rutas que coincidan con el patrón {@code /api/**}.
+     * </p>
+     *
+     * @return instancia de {@link GroupedOpenApi} configurada para las rutas públicas.
      */
     @Bean
     public GroupedOpenApi publicApi() {

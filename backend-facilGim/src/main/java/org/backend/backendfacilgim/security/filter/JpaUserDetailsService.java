@@ -1,6 +1,5 @@
 package org.backend.backendfacilgim.security.filter;
 
-
 import org.backend.backendfacilgim.entity.Usuario;
 import org.backend.backendfacilgim.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,8 @@ import java.util.stream.Collectors;
 /**
  * Servicio que se integra con Spring Security para cargar los detalles de un usuario
  * (UserDetails) desde la base de datos, mapeando la entidad Usuario y su lista de roles.
+ *
+ * @author Francisco Santana
  */
 @Service
 public class JpaUserDetailsService implements UserDetailsService {

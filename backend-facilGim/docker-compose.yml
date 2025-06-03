@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: facilgim-db
+    restart: always
+    environment:
+      # Nombre de la BD que creará MySQL
+      MYSQL_DATABASE: facilgim_db
+      # Usuario y contraseña para la aplicación Spring
+      MYSQL_USER: facilgim
+      MYSQL_PASSWORD: facilgim
+      # Contraseña del usuario root
+      MYSQL_ROOT_PASSWORD: rootpw
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  backend:
+    image: santana1996/backend-facilgim:1.0.0
+    container_name: facilgim-backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8443:8443"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/facilgim_db
+      SPRING_DATASOURCE_USERNAME: facilgim
+      SPRING_DATASOURCE_PASSWORD: facilgim
+
+volumes:
+  db_data:

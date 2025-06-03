@@ -1,4 +1,3 @@
-// src/main/java/org/backend/backendfacilgim/service/implementacion/EntrenamientoServiceImpl.java
 package org.backend.backendfacilgim.service.implementacion;
 
 import org.backend.backendfacilgim.dto.EntrenamientoDTO;
@@ -14,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Implementación del servicio {@link EntrenamientoService} que gestiona las operaciones
+ * CRUD para la entidad {@link Entrenamiento} y sus relaciones con ejercicios y series.
+ *
+ * Autor: Francisco Santana
+ */
 @Service
 public class EntrenamientoServiceImpl implements EntrenamientoService {
 
@@ -23,6 +28,15 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
     private final EjercicioRepository ejercicioRepository;
     private final EntrenamientoEjercicioRepository entrenamientoEjercicioRepository;
 
+    /**
+     * Constructor que inicializa todos los repositorios necesarios.
+     *
+     * @param entrenamientoRepository        Repositorio de entrenamientos.
+     * @param usuarioRepository              Repositorio de usuarios.
+     * @param tipoEntrenamientoRepository    Repositorio de tipos de entrenamiento.
+     * @param ejercicioRepository            Repositorio de ejercicios.
+     * @param entrenamientoEjercicioRepository Repositorio de relaciones entrenamiento-ejercicio.
+     */
     public EntrenamientoServiceImpl(
             EntrenamientoRepository entrenamientoRepository,
             UsuarioRepository usuarioRepository,
@@ -37,32 +51,69 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         this.entrenamientoEjercicioRepository = entrenamientoEjercicioRepository;
     }
 
+    /**
+     * Lista todos los entrenamientos almacenados en la base de datos.
+     *
+     * @return Lista de {@link Entrenamiento}
+     */
     @Override
     public List<Entrenamiento> obtenerTodosLosEntrenamientos() {
         return entrenamientoRepository.findAll();
     }
 
+    /**
+     * Obtiene los entrenamientos cuya fecha de entrenamiento está entre dos fechas dadas.
+     *
+     * @param fechaInicio Fecha de inicio del rango (inclusive).
+     * @param fechaFin    Fecha de fin del rango (inclusive).
+     * @return Lista de {@link Entrenamiento} dentro del rango de fechas.
+     */
     @Override
     public List<Entrenamiento> obtenerEntrenamientosEntreDosFechas(LocalDate fechaInicio, LocalDate fechaFin) {
         return entrenamientoRepository.findByFechaEntrenamientoBetween(fechaInicio, fechaFin);
     }
 
+    /**
+     * Busca un entrenamiento por su ID.
+     *
+     * @param id ID del entrenamiento.
+     * @return {@link Optional} con el entrenamiento si existe, o vacío si no.
+     */
     @Override
     public Optional<Entrenamiento> obtenerEntrenamientoPorId(Integer id) {
         return entrenamientoRepository.findById(id);
     }
 
+    /**
+     * Busca entrenamientos que coincidan con un nombre dado.
+     *
+     * @param nombre Nombre o parte del nombre del entrenamiento.
+     * @return Lista de entrenamientos con el nombre especificado.
+     */
     @Override
     public List<Entrenamiento> obtenerEntrenamientosPorNombre(String nombre) {
         return entrenamientoRepository.findEntrenamientosByNombre(nombre);
     }
 
+    /**
+     * Crea un nuevo entrenamiento en la base de datos.
+     *
+     * @param entrenamiento Objeto {@link Entrenamiento} a crear.
+     * @return El {@link Entrenamiento} recién guardado.
+     */
     @Override
     public Entrenamiento crearEntrenamiento(Entrenamiento entrenamiento) {
         return entrenamientoRepository.save(entrenamiento);
     }
 
-
+    /**
+     * Actualiza los campos básicos de un entrenamiento existente (no maneja relaciones con ejercicios/series).
+     *
+     * @param id           ID del entrenamiento a actualizar.
+     * @param datosNuevos  Objeto {@link Entrenamiento} con los nuevos datos.
+     * @return El {@link Entrenamiento} actualizado.
+     * @throws CustomException si no se encuentra el entrenamiento con el ID dado.
+     */
     @Override
     public Entrenamiento actualizarEntrenamiento(Integer id, Entrenamiento datosNuevos) {
         Entrenamiento entrenamientoExistente = entrenamientoRepository.findById(id)
@@ -70,6 +121,14 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return actualizarEntrenamiento(entrenamientoExistente, datosNuevos);
     }
 
+    /**
+     * Actualiza un entrenamiento buscándolo por nombre (el primero que coincida).
+     *
+     * @param nombre       Nombre del entrenamiento a actualizar.
+     * @param datosNuevos  Objeto {@link Entrenamiento} con los nuevos datos.
+     * @return El {@link Entrenamiento} actualizado.
+     * @throws CustomException si no se encuentra ningún entrenamiento con el nombre dado.
+     */
     @Override
     public Entrenamiento actualizarEntrenamientoPorNombre(String nombre, Entrenamiento datosNuevos) {
         List<Entrenamiento> entrenamientos = entrenamientoRepository.findEntrenamientosByNombre(nombre);
@@ -79,8 +138,15 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return actualizarEntrenamiento(entrenamientos.get(0), datosNuevos);
     }
 
-    // src/main/java/org/backend/backendfacilgim/service/implementacion/EntrenamientoServiceImpl.java
-
+    /**
+     * Actualiza un entrenamiento a partir de un DTO {@link EntrenamientoDTO}, incluyendo sus relaciones
+     * con ejercicios y series. El método es transaccional para asegurar la consistencia de las relaciones.
+     *
+     * @param id  ID del entrenamiento a actualizar.
+     * @param dto Objeto {@link EntrenamientoDTO} con los nuevos datos y relaciones.
+     * @return El {@link Entrenamiento} actualizado y guardado en la base de datos.
+     * @throws CustomException si no se encuentra el entrenamiento, usuario, tipo o ejercicio especificado.
+     */
     @Override
     @Transactional
     public Entrenamiento actualizarEntrenamientoDesdeDTO(Integer id, EntrenamientoDTO dto) {
@@ -148,9 +214,12 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return entrenamientoRepository.save(existente);
     }
 
-
-
-
+    /**
+     * Elimina un entrenamiento por su ID.
+     *
+     * @param id ID del entrenamiento a eliminar.
+     * @throws CustomException si no se encuentra el entrenamiento con el ID dado.
+     */
     @Override
     public void eliminarEntrenamiento(Integer id) {
         Entrenamiento entrenamiento = entrenamientoRepository.findById(id)
@@ -158,6 +227,12 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoRepository.delete(entrenamiento);
     }
 
+    /**
+     * Elimina todos los entrenamientos que coincidan con un nombre dado.
+     *
+     * @param nombre Nombre del entrenamiento a eliminar.
+     * @throws CustomException si no se encuentra ningún entrenamiento con el nombre dado.
+     */
     @Override
     public void eliminarEntrenamientoPorNombre(String nombre) {
         List<Entrenamiento> entrenamientos = entrenamientoRepository.findEntrenamientosByNombre(nombre);
@@ -167,6 +242,16 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoRepository.deleteAll(entrenamientos);
     }
 
+    /**
+     * Elimina una instancia (relación) de ejercicio en un entrenamiento,
+     * verificando que el entrenamiento pertenezca al usuario indicado.
+     *
+     * @param idEntrenamiento ID del entrenamiento.
+     * @param idEjercicio     ID del ejercicio a quitar.
+     * @param username        Nombre de usuario propietario del entrenamiento.
+     * @throws CustomException si el entrenamiento no existe, no pertenece al usuario,
+     *                         o no existe la relación especificada.
+     */
     @Override
     public void quitarEjercicioDeEntrenamiento(Integer idEntrenamiento, Integer idEjercicio, String username) {
         Entrenamiento entrenamiento = entrenamientoRepository.findById(idEntrenamiento)
@@ -183,6 +268,15 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoEjercicioRepository.delete(rel);
     }
 
+    /**
+     * Crea un nuevo entrenamiento a partir de un DTO {@link EntrenamientoDTO}, incluyendo
+     * sus relaciones con ejercicios y series. Este método es transaccional para garantizar
+     * la creación conjunta de entrenamiento, relaciones y series.
+     *
+     * @param dto DTO {@link EntrenamientoDTO} con los datos y relaciones a crear.
+     * @return El {@link Entrenamiento} recién creado.
+     * @throws CustomException si no se encuentra el usuario, tipo o ejercicio especificado.
+     */
     @Override
     @Transactional
     public Entrenamiento crearDesdeDTO(EntrenamientoDTO dto) {
@@ -241,18 +335,29 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         return entrenamientoRepository.save(entrenamiento);
     }
 
-
-
-
+    /**
+     * Obtiene la lista de entrenamientos asociados a un usuario específico.
+     *
+     * @param usuarioIdUsuario ID del usuario.
+     * @return Lista de entrenamientos para el usuario, o lista vacía si no hay ninguno.
+     */
     @Override
     public List<Entrenamiento> encontrarEntrenamientoPorIdUsuario(Integer usuarioIdUsuario) {
-
-        if(entrenamientoRepository.findEntrenamientosByUsuario_IdUsuario(usuarioIdUsuario).isEmpty())
+        if (entrenamientoRepository.findEntrenamientosByUsuario_IdUsuario(usuarioIdUsuario).isEmpty())
             return List.of();
         return entrenamientoRepository.findEntrenamientosByUsuario_IdUsuario(usuarioIdUsuario);
     }
 
-    private Entrenamiento actualizarEntrenamiento(Entrenamiento entrenamientoEncontrado, Entrenamiento entrenamientoDatosNuevos) {
+    /**
+     * Método auxiliar que actualiza los campos básicos de un {@link Entrenamiento}
+     * existente con los datos de otro objeto {@link Entrenamiento}.
+     *
+     * @param entrenamientoEncontrado Entrenamiento ya persistido.
+     * @param entrenamientoDatosNuevos Objeto con nuevos datos.
+     * @return El {@link Entrenamiento} actualizado y guardado.
+     */
+    private Entrenamiento actualizarEntrenamiento(Entrenamiento entrenamientoEncontrado,
+                                                  Entrenamiento entrenamientoDatosNuevos) {
         entrenamientoEncontrado.setFechaEntrenamiento(entrenamientoDatosNuevos.getFechaEntrenamiento());
         entrenamientoEncontrado.setTipoEntrenamiento(entrenamientoDatosNuevos.getTipoEntrenamiento());
         entrenamientoEncontrado.setDescripcion(entrenamientoDatosNuevos.getDescripcion());
@@ -261,6 +366,4 @@ public class EntrenamientoServiceImpl implements EntrenamientoService {
         entrenamientoEncontrado.setUsuario(entrenamientoDatosNuevos.getUsuario());
         return entrenamientoRepository.save(entrenamientoEncontrado);
     }
-
-
 }

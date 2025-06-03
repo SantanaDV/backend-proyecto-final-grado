@@ -3,13 +3,17 @@ package org.backend.backendfacilgim.testController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.backend.backendfacilgim.config.TestSecurityConfig;
 import org.backend.backendfacilgim.controller.EjercicioController;
+import org.backend.backendfacilgim.dto.AsignacionConSeriesDTO;
+import org.backend.backendfacilgim.dto.ActualizacionInstanciaDTO;
 import org.backend.backendfacilgim.dto.EjercicioDTO;
 import org.backend.backendfacilgim.dto.EjercicioDeleteDTO;
+import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.Ejercicio;
 import org.backend.backendfacilgim.service.EjercicioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -21,26 +25,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 @WebMvcTest(controllers = EjercicioController.class)
 @Import({EjercicioControllerTest.MockConfig.class, TestSecurityConfig.class})
 public class EjercicioControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private EjercicioService ejercicioService;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private EjercicioService ejercicioService;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +63,8 @@ public class EjercicioControllerTest {
         ejercicio.setIdEjercicio(1);
         ejercicio.setNombre("Press Banca");
 
-        Mockito.when(ejercicioService.getEjercicio(1)).thenReturn(Optional.of(ejercicio));
+        Mockito.when(ejercicioService.getEjercicio(1))
+                .thenReturn(Optional.of(ejercicio));
 
         mockMvc.perform(get("/api/ejercicios/1"))
                 .andExpect(status().isOk())
@@ -78,10 +76,13 @@ public class EjercicioControllerTest {
         Ejercicio ejercicio = new Ejercicio();
         ejercicio.setNombre("Curl Biceps");
 
-        MockMultipartFile ejercicioJson = new MockMultipartFile("ejercicio", "",
-                "application/json", objectMapper.writeValueAsBytes(ejercicio));
+        MockMultipartFile ejercicioJson = new MockMultipartFile(
+                "ejercicio","", MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(ejercicio)
+        );
 
-        Mockito.when(ejercicioService.crearEjercicio(any())).thenReturn(ejercicio);
+        Mockito.when(ejercicioService.crearEjercicio(any(Ejercicio.class)))
+                .thenReturn(ejercicio);
 
         mockMvc.perform(multipart("/api/ejercicios")
                         .file(ejercicioJson)
@@ -95,13 +96,18 @@ public class EjercicioControllerTest {
         Ejercicio ejercicio = new Ejercicio();
         ejercicio.setNombre("Curl Biceps");
 
-        MockMultipartFile ejercicioJson = new MockMultipartFile("ejercicio", "",
-                "application/json", objectMapper.writeValueAsBytes(ejercicio));
+        MockMultipartFile ejercicioJson = new MockMultipartFile(
+                "ejercicio","", MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(ejercicio)
+        );
+        MockMultipartFile imagen = new MockMultipartFile(
+                "imagen","imagen.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "fakeimage".getBytes()
+        );
 
-        MockMultipartFile imagen = new MockMultipartFile("imagen", "imagen.jpg",
-                MediaType.IMAGE_JPEG_VALUE, "fakeimage".getBytes());
-
-        Mockito.when(ejercicioService.crearEjercicio(any())).thenReturn(ejercicio);
+        Mockito.when(ejercicioService.crearEjercicio(any(Ejercicio.class)))
+                .thenReturn(ejercicio);
 
         mockMvc.perform(multipart("/api/ejercicios")
                         .file(ejercicioJson)
@@ -113,21 +119,18 @@ public class EjercicioControllerTest {
 
     @Test
     void POST_ActualizarEjercicio_SinImagen_MantenerImagenAnterior() throws Exception {
-        Ejercicio ejercicioExistente = new Ejercicio();
-        ejercicioExistente.setIdEjercicio(2);
-        ejercicioExistente.setNombre("Remo");
-        ejercicioExistente.setImagenUrl("anterior.jpg");
-
         Ejercicio actualizado = new Ejercicio();
         actualizado.setIdEjercicio(2);
         actualizado.setNombre("Remo Nuevo");
         actualizado.setImagenUrl("anterior.jpg");
 
-        Mockito.when(ejercicioService.getEjercicio(2)).thenReturn(Optional.of(ejercicioExistente));
-        Mockito.when(ejercicioService.actualizarEjercicio(eq(2), any())).thenReturn(actualizado);
+        Mockito.when(ejercicioService.actualizarEjercicio(eq(2), any(Ejercicio.class)))
+                .thenReturn(actualizado);
 
-        MockMultipartFile ejercicioJson = new MockMultipartFile("ejercicio", "",
-                "application/json", objectMapper.writeValueAsBytes(actualizado));
+        MockMultipartFile ejercicioJson = new MockMultipartFile(
+                "ejercicio","", MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(actualizado)
+        );
 
         mockMvc.perform(multipart("/api/ejercicios")
                         .file(ejercicioJson)
@@ -151,7 +154,8 @@ public class EjercicioControllerTest {
         dto.setNombre("Remo");
         dto.setUsernamePropietario("usuario1");
 
-        Mockito.doNothing().when(ejercicioService).eliminarEjercicioPorNombre("Remo", "usuario1");
+        Mockito.doNothing().when(ejercicioService)
+                .eliminarEjercicioPorNombre("Remo", "usuario1");
 
         mockMvc.perform(delete("/api/ejercicios/nombre")
                         .with(csrf())
@@ -160,10 +164,68 @@ public class EjercicioControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void POST_AsignarAEentrenamientoConSeries() throws Exception {
+        AsignacionConSeriesDTO body = new AsignacionConSeriesDTO();
+        body.setEjercicioId(5);
+        // lista de Series correcta
+        List<SerieDTO> series = List.of(new SerieDTO(null, 1, 3, 50.0));
+        body.setSeries(series);
+        body.setOrden(1);
+
+        EjercicioDTO dto = new EjercicioDTO();
+        dto.setIdEjercicio(10);
+        dto.setNombre("Flexiones");
+
+        Mockito.when(ejercicioService
+                        .asignarEjercicioConSeriesAEntrenamiento(eq(7), eq(5), eq(series), eq(1)))
+                .thenReturn(dto);
+
+        mockMvc.perform(post("/api/ejercicios/entrenamiento/7/asignar")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idEjercicio").value(10))
+                .andExpect(jsonPath("$.nombre").value("Flexiones"));
+    }
+
+    @Test
+    void PUT_ActualizarInstanciaEnEntrenamiento() throws Exception {
+        ActualizacionInstanciaDTO body = new ActualizacionInstanciaDTO();
+        List<SerieDTO> series = List.of(new SerieDTO(null, 1, 8, 60.0));
+        body.setSeries(series);
+        body.setOrden(2);
+
+        EjercicioDTO dto = new EjercicioDTO();
+        dto.setIdEjercicio(11);
+        dto.setNombre("Dominadas");
+
+        Mockito.when(ejercicioService
+                        .actualizarInstanciaConSeries(eq(9), eq(series), eq(2)))
+                .thenReturn(dto);
+
+        mockMvc.perform(put("/api/ejercicios/entrenamiento/ejercicio/9")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idEjercicio").value(11))
+                .andExpect(jsonPath("$.nombre").value("Dominadas"));
+    }
+
+    @Test
+    void DELETE_EliminarInstanciaEnEntrenamiento() throws Exception {
+        Mockito.doNothing().when(ejercicioService).eliminarInstancia(12);
+
+        mockMvc.perform(delete("/api/ejercicios/entrenamiento/ejercicio/12")
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+
     @TestConfiguration
     static class MockConfig {
-        @Bean
-        public EjercicioService ejercicioService() {
+        @Bean public EjercicioService ejercicioService() {
             return Mockito.mock(EjercicioService.class);
         }
     }

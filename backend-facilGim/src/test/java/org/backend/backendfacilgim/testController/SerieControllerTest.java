@@ -9,6 +9,7 @@ import org.backend.backendfacilgim.service.SerieService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +22,9 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 @WebMvcTest(controllers = SerieController.class)
 @Import({SerieControllerTest.MockConfig.class, TestSecurityConfig.class})
@@ -72,6 +72,7 @@ class SerieControllerTest {
         when(serieService.crear(any())).thenReturn(serie);
 
         mockMvc.perform(post("/api/series")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -90,6 +91,7 @@ class SerieControllerTest {
         when(serieService.actualizar(Mockito.eq(1), any())).thenReturn(serie);
 
         mockMvc.perform(put("/api/series/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -115,7 +117,8 @@ class SerieControllerTest {
     void DELETE_EliminarSerie() throws Exception {
         Mockito.doNothing().when(serieService).eliminar(1);
 
-        mockMvc.perform(delete("/api/series/1"))
+        mockMvc.perform(delete("/api/series/1")
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -127,3 +130,4 @@ class SerieControllerTest {
         }
     }
 }
+

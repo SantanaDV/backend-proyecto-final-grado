@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.backend.backendfacilgim.config.TestSecurityConfig;
 import org.backend.backendfacilgim.controller.EntrenamientoController;
 import org.backend.backendfacilgim.dto.EntrenamientoDTO;
+import org.backend.backendfacilgim.dto.TipoEntrenamientoDTO;
+import org.backend.backendfacilgim.dto.UsuarioDTO;
 import org.backend.backendfacilgim.entity.Entrenamiento;
 import org.backend.backendfacilgim.entity.TipoEntrenamiento;
 import org.backend.backendfacilgim.entity.Usuario;
@@ -11,11 +13,11 @@ import org.backend.backendfacilgim.service.EntrenamientoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,13 +25,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 @WebMvcTest(controllers = EntrenamientoController.class)
 @Import({EntrenamientoControllerTest.MockConfig.class, TestSecurityConfig.class})
@@ -54,7 +55,8 @@ public class EntrenamientoControllerTest {
         Entrenamiento ent = new Entrenamiento();
         ent.setNombre("Piernas");
 
-        Mockito.when(entrenamientoService.obtenerTodosLosEntrenamientos()).thenReturn(List.of(ent));
+        Mockito.when(entrenamientoService.obtenerTodosLosEntrenamientos())
+                .thenReturn(List.of(ent));
 
         mockMvc.perform(get("/api/entrenamientos"))
                 .andExpect(status().isOk())
@@ -63,7 +65,7 @@ public class EntrenamientoControllerTest {
 
     @Test
     void GET_EntrenamientosPorFechas() throws Exception {
-        Mockito.when(entrenamientoService.obtenerEntrenamientosEntreDosFechas(any(), any()))
+        Mockito.when(entrenamientoService.obtenerEntrenamientosEntreDosFechas(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(new Entrenamiento()));
 
         mockMvc.perform(get("/api/entrenamientos/fecha")
@@ -79,7 +81,8 @@ public class EntrenamientoControllerTest {
         ent.setIdEntrenamiento(1);
         ent.setNombre("Pecho");
 
-        Mockito.when(entrenamientoService.obtenerEntrenamientoPorId(1)).thenReturn(Optional.of(ent));
+        Mockito.when(entrenamientoService.obtenerEntrenamientoPorId(1))
+                .thenReturn(Optional.of(ent));
 
         mockMvc.perform(get("/api/entrenamientos/1"))
                 .andExpect(status().isOk())
@@ -88,10 +91,33 @@ public class EntrenamientoControllerTest {
 
     @Test
     void GET_PorId_Inexistente() throws Exception {
-        Mockito.when(entrenamientoService.obtenerEntrenamientoPorId(999)).thenReturn(Optional.empty());
+        Mockito.when(entrenamientoService.obtenerEntrenamientoPorId(999))
+                .thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/entrenamientos/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void GET_PorUsuarioId() throws Exception {
+        Mockito.when(entrenamientoService.encontrarEntrenamientoPorIdUsuario(5))
+                .thenReturn(List.of(new Entrenamiento()));
+
+        mockMvc.perform(get("/api/entrenamientos/usuarioId/5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void GET_PorNombre() throws Exception {
+        Entrenamiento ent = new Entrenamiento();
+        ent.setNombre("Cardio");
+        Mockito.when(entrenamientoService.obtenerEntrenamientosPorNombre("Cardio"))
+                .thenReturn(List.of(ent));
+
+        mockMvc.perform(get("/api/entrenamientos/nombre/Cardio"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nombre").value("Cardio"));
     }
 
     @Test
@@ -101,21 +127,30 @@ public class EntrenamientoControllerTest {
         ent.setDescripcion("Entrenamiento de espalda");
         ent.setDuracion(45);
         ent.setFechaEntrenamiento(LocalDate.now());
-
-        // Mock entidades necesarias
         ent.setTipoEntrenamiento(new TipoEntrenamiento(1, "Fuerza"));
         ent.setUsuario(new Usuario(1, "user", "pass", "user@example.com"));
 
-        Mockito.when(entrenamientoService.crearEntrenamiento(any())).thenReturn(ent);
+        // Construcción del DTO con los tipos correctos
+        EntrenamientoDTO dto = new EntrenamientoDTO();
+        dto.setNombre("Espalda");
+        dto.setDescripcion("Entrenamiento de espalda");
+        dto.setDuracion(45);
+        dto.setFechaEntrenamiento(LocalDate.now());
+        dto.setTipoEntrenamiento(new TipoEntrenamientoDTO(1L, "Fuerza"));
+        dto.setUsuario(new UsuarioDTO(1, "user", null, "user@example.com", "", "", "", false));
+        dto.setEjerciciosId(List.of(101));
+        dto.setEntrenamientosEjercicios(null);
+
+        Mockito.when(entrenamientoService.crearDesdeDTO(any(EntrenamientoDTO.class)))
+                .thenReturn(ent);
 
         mockMvc.perform(post("/api/entrenamientos")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ent)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nombre").value("Espalda"));
     }
-
 
     @Test
     void PUT_ActualizarPorId() throws Exception {
@@ -127,7 +162,7 @@ public class EntrenamientoControllerTest {
         ent.setTipoEntrenamiento(new TipoEntrenamiento(1, "Fuerza"));
         ent.setUsuario(new Usuario(1, "user", "pass", "user@example.com"));
 
-        Mockito.when(entrenamientoService.actualizarEntrenamiento(eq(1), any()))
+        Mockito.when(entrenamientoService.actualizarEntrenamiento(eq(1), any(Entrenamiento.class)))
                 .thenReturn(ent);
 
         mockMvc.perform(put("/api/entrenamientos/1")
@@ -148,12 +183,11 @@ public class EntrenamientoControllerTest {
         ent.setTipoEntrenamiento(new TipoEntrenamiento(1, "Fuerza"));
         ent.setUsuario(new Usuario(1, "user", "pass", "user@example.com"));
 
-        Mockito.when(entrenamientoService.actualizarEntrenamientoPorNombre(eq("base"), any()))
+        Mockito.when(entrenamientoService.actualizarEntrenamientoPorNombre(eq("base"), any(Entrenamiento.class)))
                 .thenReturn(ent);
 
         mockMvc.perform(put("/api/entrenamientos/nombre/base")
                         .with(csrf())
-                        .param("username", "user1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ent)))
                 .andExpect(status().isOk())
@@ -165,17 +199,18 @@ public class EntrenamientoControllerTest {
         Entrenamiento ent = new Entrenamiento();
         ent.setNombre("Core");
 
-        Mockito.when(entrenamientoService.actualizarEntrenamientoDesdeDTO(eq(1), any()))
-                .thenReturn(ent);
-
         EntrenamientoDTO dto = new EntrenamientoDTO();
         dto.setNombre("Core");
         dto.setDescripcion("Entrenamiento de core completo");
         dto.setDuracion(30);
         dto.setFechaEntrenamiento(LocalDate.now());
-        //dto.setTipoEntrenamientoId(1L);
-      //  dto.setUsuarioId(1);
-        dto.setEjerciciosId(List.of(101)); // Un ejercicio dummy
+        dto.setTipoEntrenamiento(new TipoEntrenamientoDTO(1L, "Fuerza"));
+        dto.setUsuario(new UsuarioDTO(1, "user", null, "user@example.com", "", "", "", false));
+        dto.setEjerciciosId(List.of(101));
+        dto.setEntrenamientosEjercicios(null);
+
+        Mockito.when(entrenamientoService.actualizarEntrenamientoDesdeDTO(eq(1), any(EntrenamientoDTO.class)))
+                .thenReturn(ent);
 
         mockMvc.perform(put("/api/entrenamientos/dto/1")
                         .with(csrf())
@@ -184,7 +219,6 @@ public class EntrenamientoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Core"));
     }
-
 
     @Test
     void DELETE_EntrenamientoPorId() throws Exception {
