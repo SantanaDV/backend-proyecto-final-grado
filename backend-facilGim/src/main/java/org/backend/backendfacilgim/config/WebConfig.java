@@ -8,12 +8,10 @@ import java.nio.file.Paths;
 
 /**
  * Configuración de recursos estáticos para servir archivos cargados.
- * <p>
  * Hace que los archivos almacenados en el directorio local "uploads"
  * sean accesibles mediante la ruta {@code /uploads/**} en la aplicación.
- * </p>
  *
- * Autor: Francisco Santana
+ *  @author Francisco Santana
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -21,10 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * Registra un recurso estático que mapea todas las peticiones a {@code /uploads/**}
      * al directorio físico "uploads" en el sistema de archivos.
-     * <p>
      * Esto permite que, por ejemplo, la URL {@code /uploads/imagen.jpg} sirva
      * el archivo {@code uploads/imagen.jpg} ubicado en el disco.
-     * </p>
      *
      * @param registry Registro de recursos al que se añaden los mapeos.
      */

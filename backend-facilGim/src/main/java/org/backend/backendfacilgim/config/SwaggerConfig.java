@@ -9,12 +9,10 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuración de Springdoc OpenAPI (Swagger) para la aplicación.
- * <p>
  * Define los beans necesarios para generar la documentación interactiva
  * de la API, accesible en {@code /swagger-ui.html} y los endpoints de OpenAPI.
- * </p>
  *
- * Autor: Francisco Santana
+ *  @author Francisco Santana
  */
 @Configuration
 public class SwaggerConfig {
@@ -22,10 +20,8 @@ public class SwaggerConfig {
     /**
      * Bean principal que configura la información básica de la API:
      * título, descripción, versión y documentación externa.
-     * <p>
      * Esta configuración se mostrará en la interfaz de Swagger UI
      * y en el archivo JSON de OpenAPI disponible en {@code /api-docs}.
-     * </p>
      *
      * @return instancia de {@link OpenAPI} con la información de la API.
      */
@@ -45,10 +41,8 @@ public class SwaggerConfig {
 
     /**
      * Bean que agrupa las rutas que deben incluirse en la documentación pública.
-     * <p>
      * Define un grupo llamado {@code public-api} que incluirá únicamente
      * las rutas que coincidan con el patrón {@code /api/**}.
-     * </p>
      *
      * @return instancia de {@link GroupedOpenApi} configurada para las rutas públicas.
      */

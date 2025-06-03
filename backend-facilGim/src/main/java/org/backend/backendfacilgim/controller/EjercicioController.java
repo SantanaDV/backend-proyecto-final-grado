@@ -18,13 +18,11 @@ import java.util.List;
 
 /**
  * Controlador REST para gestionar el catálogo de ejercicios y sus instancias en entrenamientos.
- * <p>
  * Proporciona endpoints para:
  * <ul>
  *   <li>Listar, crear, actualizar y eliminar ejercicios del catálogo global.</li>
  *   <li>Asignar, actualizar y eliminar instancias de ejercicio en un entrenamiento.</li>
  * </ul>
- * </p>
  *
  * Autor: Francisco Santana
  */
@@ -74,10 +72,8 @@ public class EjercicioController {
 
     /**
      * Crea un nuevo ejercicio en el catálogo o actualiza uno existente.
-     * <p>
      * Recibe un JSON en el campo "ejercicio" y opcionalmente un archivo de imagen
      * en el campo "imagen" dentro de una petición multipart/form-data.
-     * </p>
      *
      * @param ejercicioJson Cadena JSON que representa el objeto {@link Ejercicio}.
      * @param imagen        Archivo de imagen asociado; puede ser nulo o vacío.
@@ -135,9 +131,7 @@ public class EjercicioController {
 
     /**
      * Elimina un ejercicio del catálogo por su nombre.
-     * <p>
      * Recibe un DTO {@link EjercicioDeleteDTO} con el nombre y el usuario propietario.
-     * </p>
      *
      * @param datos DTO que contiene {@code nombre} del ejercicio y {@code usernamePropietario}.
      * @return ResponseEntity con estado 204 No Content.

@@ -12,12 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Inicializa datos esenciales en la base de datos al iniciar la aplicación.
- * <p>
  * Crea los roles {@code ROLE_USER} y {@code ROLE_ADMIN} si no existen,
  * y también crea un usuario administrador con usuario {@code "admin"} si aún no está registrado.
- * </p>
- *
- * Autor: Francisco Santana
+ *  @author Francisco Santana
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -33,13 +30,11 @@ public class DataInitializer implements CommandLineRunner {
 
     /**
      * Ejecuta la inicialización de datos al arrancar la aplicación.
-     * <p>
      * - Verifica si existe el rol {@code ROLE_USER}; si no existe, lo crea.
      * - Verifica si existe el rol {@code ROLE_ADMIN}; si no existe, lo crea.
      * - Verifica si existe el usuario con nombre {@code "admin"}; si no existe,
      *   crea un usuario con contraseña codificada {@code "admin"}, correo,
      *   nombre y apellido por defecto, y asigna ambos roles (USER y ADMIN).
-     * </p>
      *
      * @param args Argumentos de línea de comandos (no se utilizan).
      * @throws Exception Si ocurre algún error durante la inicialización.
