@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.backend.backendfacilgim.dto.*;
 import org.backend.backendfacilgim.entity.Ejercicio;
 import org.backend.backendfacilgim.exception.CustomException;
+import org.springframework.beans.factory.annotation.Value;
 import org.backend.backendfacilgim.service.EjercicioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,8 @@ public class EjercicioController {
 
     private final EjercicioService ejercicioService;
     private final ObjectMapper objectMapper;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     /**
      * Constructor que inyecta el servicio de ejercicios y crea el ObjectMapper.
