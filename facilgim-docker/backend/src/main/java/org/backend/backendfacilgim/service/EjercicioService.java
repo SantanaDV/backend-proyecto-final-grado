@@ -3,6 +3,7 @@ package org.backend.backendfacilgim.service;
 import org.backend.backendfacilgim.dto.EjercicioDTO;
 import org.backend.backendfacilgim.dto.SerieDTO;
 import org.backend.backendfacilgim.entity.Ejercicio;
+import org.backend.backendfacilgim.exception.CustomException;
 
 import java.util.List;
 import java.util.Optional;

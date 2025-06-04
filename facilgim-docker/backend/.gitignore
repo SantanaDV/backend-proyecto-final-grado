@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+# Ignorar docker-compose.yml del backend
+facilgim-docker/docker-compose.yml
+
+# Ignorar application.properties local
+facilgim-docker/backend/src/main/resources/application.properties
+
+# Ignorar variables.env
+facilgim-docker/variables.env
+
+# Ignorar el Dockerfile
+facilgim-docker/backend/Dockerfile
