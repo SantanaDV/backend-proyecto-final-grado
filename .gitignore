@@ -112,7 +112,14 @@ fabric.properties
 hs_err_pid*
 replay_pid*
 
-facilgim-docker/variables.env
+
 facilgim-docker/backend/docker-compose.yml
-C:\Users\santa\OneDrive\Desktop\CosasEscritorio\2DAM\Proyecto_final_grado\Proyecto\backend\backend-proyecto-final-grado\facilgim-docker\backend\src\main\resources\application.properties
-C:\Users\santa\OneDrive\Desktop\CosasEscritorio\2DAM\Proyecto_final_grado\Proyecto\backend\backend-proyecto-final-grado\facilgim-docker\variables.env
+facilgim-docker\backend\docker-compose.yml
+facilgim-docker\backend\src\main\resources\application.properties
+facilgim-docker\variables.env
+facilgim-docker/backend/src/main/resources/application.properties
+facilgim-docker/variables.env
+
+
+facilgim-docker/backend-proyecto-final-grado/facilgim-docker/backend/Dockerfile
+facilgim-docker\backend-proyecto-final-grado\facilgim-docker\backend

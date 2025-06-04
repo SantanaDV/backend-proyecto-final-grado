@@ -12,19 +12,22 @@ RUN mvn clean package -DskipTests
 
 # 2) Imagen corriendo la aplicación
 FROM eclipse-temurin:17-jdk-jammy
-ARG JAR_FILE=/app/target/*.jar
 
-# Creamos usuario no-root
-RUN useradd -ms /bin/bash appuser
+# Creamos un usuario ‘appuser’ y la carpeta uploads como root
+RUN useradd -ms /bin/bash appuser \
+ && mkdir -p /home/appuser/uploads \
+ && chown -R appuser:appuser /home/appuser/uploads
+
+# A partir de aquí, todo irá bajo appuser
 USER appuser
-
 WORKDIR /home/appuser
 
-# Copiamos el JAR generado
+# Copiamos el JAR resultante del stage de build
+ARG JAR_FILE=/app/target/*.jar
 COPY --from=build ${JAR_FILE} app.jar
 
-# Puerto expuesto
+# Exponemos el puerto 8080
 EXPOSE 8080
 
-# Arranque
+# Arrancamos la aplicación
 ENTRYPOINT ["java","-jar","app.jar"]

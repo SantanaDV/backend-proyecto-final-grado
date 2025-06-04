@@ -15,6 +15,8 @@ services:
       MYSQL_ROOT_PASSWORD: rootpw
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     networks:
       - facilgim-network
 
@@ -32,7 +34,10 @@ services:
     networks:
       - facilgim-network
     ports:
-      - "8080"
+      - "8080:8080"
+    volumes:
+      - ./backend/uploads:/home/appuser/uploads
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
