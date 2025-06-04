@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: facilgim-db
+    restart: always
+    environment:
+      # Nombre de la BD que creará MySQL
+      MYSQL_DATABASE: facilgim_db
+      # Usuario y contraseña para la aplicación Spring
+      MYSQL_USER: facilgim
+      MYSQL_PASSWORD: facilgim
+      # Contraseña del usuario root
+      MYSQL_ROOT_PASSWORD: rootpw
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - facilgim-network
+
+  backend:
+    build:
+      context: ./backend      # aquí está el Dockerfile y código fuente
+      dockerfile: Dockerfile
+    image: backend-facilgim:latest
+    container_name: facilgim-backend
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./variables.env       # variables en la raíz de facilgim-docker/
+    networks:
+      - facilgim-network
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/uploads:/home/appuser/uploads
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: facilgim-nginx
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - facilgim-network
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  db_data:
+
+networks:
+  facilgim-network:
+    driver: bridge
