@@ -113,13 +113,15 @@ hs_err_pid*
 replay_pid*
 
 
+# Ignorar docker-compose.yml del backend (si quieres que sea local)
 facilgim-docker/backend/docker-compose.yml
-facilgim-docker\backend\docker-compose.yml
-facilgim-docker\backend\src\main\resources\application.properties
-facilgim-docker\variables.env
+
+# Ignorar application.properties local
 facilgim-docker/backend/src/main/resources/application.properties
+
+# Ignorar variables.env
 facilgim-docker/variables.env
 
+# Ignorar el Dockerfile
+facilgim-docker/backend/Dockerfile
 
-facilgim-docker/backend-proyecto-final-grado/facilgim-docker/backend/Dockerfile
-facilgim-docker\backend-proyecto-final-grado\facilgim-docker\backend
