@@ -114,7 +114,7 @@ replay_pid*
 
 
 # Ignorar docker-compose.yml del backend (si quieres que sea local)
-facilgim-docker/backend/docker-compose.yml
+facilgim-docker/docker-compose.yml
 
 # Ignorar application.properties local
 facilgim-docker/backend/src/main/resources/application.properties
