@@ -1,12 +1,16 @@
-#  Backend FacilGim
+# FacilGim Backend
 
 Este repositorio contiene el backend del proyecto **FacilGim**, desarrollado con **Spring Boot y Java 17**. FacilGim permite gestionar entrenamientos personales, incluyendo ejercicios detallados con repeticiones y pesos utilizados, autenticación mediante JWT y administración por roles.
 
 ---
 
-## 📌 Descripción del Proyecto
+## Características principales
 
-**FacilGim** es una aplicación destinada a simplificar el seguimiento de entrenamientos, permitiendo a los usuarios crear, editar y eliminar entrenamientos y ejercicios. El sistema es seguro y utiliza JWT (JSON Web Tokens) para autenticar usuarios y proteger el acceso a recursos.
+- Autenticación y autorización con JSON Web Tokens.
+- CRUD de usuarios, entrenamientos y ejercicios.
+- Roles (USER y ADMIN) con Spring Security.
+- Documentación automática con Swagger/OpenAPI.
+- Despliegue mediante Docker.
 
 ---
 
@@ -19,8 +23,10 @@ Este repositorio contiene el backend del proyecto **FacilGim**, desarrollado con
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/hibernate/hibernate-original.svg" width="20" height="20"> **Spring Data JPA**  
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width="20" height="20"> **MySQL**  
 - <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/maven/maven-original.svg" width="20" height="20"> **Maven**
-
-
+- <img src="https://www.clipartmax.com/png/middle/146-1469802_logo-logo-docker.png" width="20" height="20"> **Docker**
+- <img src="https://c0.klipartz.com/pngpicture/719/226/gratis-png-implementacion-de-software-docker-yaml-integracion-continua-senor.png" width="20" height="20"> **Docker Compose**
+- <img src="https://static-00.iconduck.com/assets.00/swagger-icon-512x512-halz44im.png"  width="20" height="20"> **Swagger**
+- OpenAPI (springdoc)
 ---
 
 ## 🗃️ Diseño de la Base de Datos
