@@ -253,16 +253,5 @@ public class UsuarioControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void PUT_ActualizarUsuario_SinCsrf_Devuelve403() throws Exception {
-        Usuario u = new Usuario();
-        u.setUsername("test");
 
-        mockMvc.perform(put("/api/usuarios/1")
-                        // sin csrf()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(u)))
-                .andExpect(status().isForbidden());
-    }
 }

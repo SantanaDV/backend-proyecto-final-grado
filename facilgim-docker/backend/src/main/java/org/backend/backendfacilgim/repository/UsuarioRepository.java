@@ -48,6 +48,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
      * @return {@code true} si hay al menos un usuario con ese rol, {@code false} en caso contrario
      */
     boolean existsByRoles_Name(String roleName);
-
-    // Los demás métodos CRUD básicos están heredados de JpaRepository.
 }
